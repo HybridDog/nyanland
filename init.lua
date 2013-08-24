@@ -8,7 +8,7 @@ local nyanland={}
 --Cloudstone
 minetest.register_node("nyanland:cloudstone", {
 	description = "nyanland:cloudstone",
-	tile_images = {"nyanland_cloudstone.png"},
+	tiles = {"nyanland_cloudstone.png"},
 	inventory_image = minetest.inventorycube("nyanland_cloudstone.png"),
 	use_texture_alpha = true,
 	sunlight_propagates = true,
@@ -19,7 +19,7 @@ minetest.register_node("nyanland:cloudstone", {
 
 minetest.register_node("nyanland:cloudstone_var", {
 	description = "nyanland:cloudstone_var",
-	tile_images = {"nyanland_cloudstone_var.png", "nyanland_cloudstone_var.png", "nyanland_cloudstone.png"},
+	tiles = {"nyanland_cloudstone_var.png", "nyanland_cloudstone_var.png", "nyanland_cloudstone.png"},
 	inventory_image = minetest.inventorycube("nyanland_cloudstone_var.png"),
 	use_texture_alpha = true,
 	sunlight_propagates = true,
@@ -40,7 +40,7 @@ minetest.register_node("nyanland:meseleaves", {
 	description = "nyanland:meseleaves",
 	drawtype = "allfaces_optional",
 	visual_scale = 2,
-	tile_images = {"nyanland_meseleaves.png"},
+	tiles = {"nyanland_meseleaves.png"},
 	inventory_image = minetest.inventorycube("nyanland_meseleaves.png"),
 	paramtype = "light",
 	furnace_burntime = 5,
@@ -85,7 +85,7 @@ minetest.register_node("nyanland:mese_shrub_fruits", {
 -- Clonestone
 minetest.register_node("nyanland:clonestone", {
 	description = "nyanland:clonestone",
-	tile_images = {"nyanland_clonestone.png"},
+	tiles = {"nyanland_clonestone.png"},
 	inventory_image = minetest.inventorycube("nyanland_clonestone.png"),
 	furnace_burntime = 100,
 	groups = {cracky = 1},
@@ -111,7 +111,7 @@ minetest.register_abm({
 -- Healstone
 minetest.register_node("nyanland:healstone", {
 	description = "nyanland:healstone",
-	tile_images = {"nyanland_healstone.png"},
+	tiles = {"nyanland_healstone.png"},
 	inventory_image = minetest.inventorycube("nyanland_healstone.png"),
 	furnace_burntime = 100,
 	groups = {cracky = 1},
