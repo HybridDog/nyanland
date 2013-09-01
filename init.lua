@@ -301,6 +301,7 @@ minetest.register_abm(
 		if pos.y>NYANLAND_HEIGHT then
 			minetest.env:remove_node(pos)
 			minetest.env:add_entity(pos, "nyanland:head_entity")
+			minetest.sound_play("nyanland_cat", {pos = pos,	gain = 0.9,	max_hear_distance = 35})
 		end
 	end,
 })
