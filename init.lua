@@ -7,7 +7,6 @@ local nyanland={}
 
 --Cloudstone
 minetest.register_node("nyanland:cloudstone", {
-	description = "nyanland:cloudstone",
 	tiles = {"nyanland_cloudstone.png"},
 	inventory_image = minetest.inventorycube("nyanland_cloudstone.png"),
 	use_texture_alpha = true,
@@ -18,7 +17,6 @@ minetest.register_node("nyanland:cloudstone", {
 })
 
 minetest.register_node("nyanland:cloudstone_var", {
-	description = "nyanland:cloudstone_var",
 	tiles = {"nyanland_cloudstone_var.png", "nyanland_cloudstone_var.png", "nyanland_cloudstone.png"},
 	inventory_image = minetest.inventorycube("nyanland_cloudstone_var.png"),
 	use_texture_alpha = true,
@@ -37,7 +35,6 @@ minetest.register_node("nyanland:mesetree", {
 })
 
 minetest.register_node("nyanland:meseleaves", {
-	description = "nyanland:meseleaves",
 	drawtype = "allfaces_optional",
 	visual_scale = 2,
 	tiles = {"nyanland_meseleaves.png"},
@@ -83,28 +80,28 @@ minetest.register_node("nyanland:mese_shrub_fruits", {
 })
 
 -- Clonestone
+local function clone_node(pos)
+	local node_over = minetest.get_node({x=pos.x, y=pos.y+1, z=pos.z}).name
+	if node_over ~= "air"
+	and node_over ~= "nyanland:clonestone" then
+		minetest.add_node(pos, {name=node_over})
+	end
+--	nodeupdate(pos)
+end
+
 minetest.register_node("nyanland:clonestone", {
-	description = "nyanland:clonestone",
 	tiles = {"nyanland_clonestone.png"},
 	inventory_image = minetest.inventorycube("nyanland_clonestone.png"),
 	furnace_burntime = 100,
 	groups = {cracky = 1},
 })
 
--- Clone items
 minetest.register_abm({
 	nodenames = {"nyanland:clonestone"},
-	interval = 1,
+	interval = 5,
 	chance = 1,
 	action = function(pos)
-		local pos_under = {x=pos.x, y=pos.y-1, z=pos.z}
-		local node_over = minetest.env:get_node({x=pos.x, y=pos.y+1, z=pos.z}).name
-		if minetest.env:get_node(pos_under).name == "air"
-		and node_over ~= "air"
-		and node_over ~= "nyanland:clonestone" then
-			minetest.env:add_node(pos_under, {name=node_over})
-		end
---		nodeupdate(pos_under)
+		clone_node(pos)
 	end,
 })
 
@@ -122,7 +119,7 @@ minetest.register_abm(
 	interval = 1.0,
 	chance = 1,
 	action = function(pos)
-		local objs = minetest.env:get_objects_inside_radius(pos, 3)
+		local objs = minetest.get_objects_inside_radius(pos, 3)
 		for k, obj in pairs(objs) do
 			local hp = obj:get_hp()
 			if hp >= 20 then return end
@@ -215,11 +212,11 @@ end)
 
 function nyanland:add_nyancat(nyan_headpos)
 	local nyan_tailpos={}
-	minetest.env:add_node(nyan_headpos, {name="default:nyancat"})
+	minetest.add_node(nyan_headpos, {name="default:nyancat"})
 	local length=math.random(4,15)
 	for z=nyan_headpos.z+1, nyan_headpos.z+length, 1 do
 		nyan_tailpos={x=nyan_headpos.x, y=nyan_headpos.y, z=z}
-		minetest.env:add_node(nyan_tailpos, {name="default:nyancat_rainbow"})
+		minetest.add_node(nyan_tailpos, {name="default:nyancat_rainbow"})
 	end
 end
 
@@ -270,7 +267,7 @@ function nyanland:grow_mesetree(pos)
 				if (x-trunkpos.x)^2+(y-trunkpos.y)^2+(z-trunkpos.z)^2<= NYANLAND_TREESIZE^2 + NYANLAND_TREESIZE then	
 					leafpos={x=x, y=y, z=z}
 					p_leafpos=area:index(leafpos.x, leafpos.y, leafpos.z)
-					if minetest.env:get_node(leafpos).name=="air"
+					if minetest.get_node(leafpos).name=="air"
 					and nodes[p_leafpos]==ignore then
 						if pr:next(1,5)==1 then
 							if pr:next(1,2)==1 then
@@ -299,8 +296,8 @@ minetest.register_abm(
 	chance = 100,
 	action = function(pos, node, active_object_count, active_object_count_wider)
 		if pos.y>NYANLAND_HEIGHT then
-			minetest.env:remove_node(pos)
-			minetest.env:add_entity(pos, "nyanland:head_entity")
+			minetest.remove_node(pos)
+			minetest.add_entity(pos, "nyanland:head_entity")
 			minetest.sound_play("nyanland_cat", {pos = pos,	gain = 0.9,	max_hear_distance = 35})
 		end
 	end,
@@ -321,7 +318,7 @@ minetest.register_entity("nyanland:head_entity", {
 	on_punch = function(self, hitter)
 		local mesepos=self.object:getpos()
 		mesepos.y=mesepos.y-1
-		minetest.env:add_entity(mesepos, "nyanland:mese")
+		minetest.add_entity(mesepos, "nyanland:mese")
 	end,
 
 	on_step = function(self, dtime)
@@ -329,24 +326,24 @@ minetest.register_entity("nyanland:head_entity", {
 		local pos = {x=math.floor(pos.x+0.5), y=math.floor(pos.y+0.5), z=math.floor(pos.z+0.5)}
 		self.timer=self.timer+dtime
 		if self.timer>=16 then	
-			minetest.env:add_node(pos, {name="default:nyancat"})
+			minetest.add_node(pos, {name="default:nyancat"})
 			self.object:remove()
 			return
 		end
-		if minetest.env:get_node(pos).name == "default:nyancat_rainbow" then	
+		if minetest.get_node(pos).name == "default:nyancat_rainbow" then	
 			self.object:remove()
 			return
 		end
 		for i = math.random(6)+18,30,1 do
 			local p = {x=pos.x, y=pos.y, z=pos.z+i}
-			if minetest.env:get_node(p).name == "default:nyancat_rainbow" then
-				minetest.env:remove_node(p)
+			if minetest.get_node(p).name == "default:nyancat_rainbow" then
+				minetest.remove_node(p)
 			end
 		end
 		for i = 1,5,1 do
 			local p = {x=pos.x, y=pos.y, z=pos.z+i}
-			if minetest.env:get_node(p).name == "air" then
-				minetest.env:add_node(p, {name="default:nyancat_rainbow"})
+			if minetest.get_node(p).name == "air" then
+				minetest.add_node(p, {name="default:nyancat_rainbow"})
 			else
 				return
 			end
@@ -377,14 +374,16 @@ minetest.register_entity("nyanland:mese", {
 		self.object:setacceleration({x=0, y=-10, z=0})
 		local pos = self.object:getpos()
 		local bcp = {x=pos.x, y=pos.y-0.7, z=pos.z} 
-		local bcn = minetest.env:get_node(bcp)
+		local bcn = minetest.get_node(bcp)
 		--if bcn.name ~= "air" then
 		--	local np = {x=bcp.x, y=bcp.y+1, z=bcp.z}
 		if self.object:getvelocity().y == 0 then
-			minetest.env:add_node(self.object:getpos(), {name="default:mese_block"})
+			minetest.add_node(self.object:getpos(), {name="default:mese_block"})
 			self.object:remove()
 		end
 		--	
 		--end
 	end
 })
+
+dofile(minetest.get_modpath("nyanland").."/portal.lua")
