@@ -8,4 +8,4 @@ Sound sources:
 — irc(freenode.net)
 
 TODO:
-— add portal (and finish it at first) from [portal] to get back
+— allow getting back

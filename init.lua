@@ -11,7 +11,6 @@ minetest.register_node("nyanland:cloudstone", {
 	inventory_image = minetest.inventorycube("nyanland_cloudstone.png"),
 	use_texture_alpha = true,
 	sunlight_propagates = true,
-	dug_item = '',
 	light_source = 10,
 	groups = {dig_immediate = 3},
 })
@@ -36,7 +35,6 @@ minetest.register_node("nyanland:mesetree", {
 
 minetest.register_node("nyanland:meseleaves", {
 	drawtype = "allfaces_optional",
-	visual_scale = 2,
 	tiles = {"nyanland_meseleaves.png"},
 	inventory_image = minetest.inventorycube("nyanland_meseleaves.png"),
 	paramtype = "light",
@@ -167,7 +165,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			local p_addpos = area:index(x, ypse+test, z)
 			local p_plantpos = area:index(x, ypse+test+1, z)
 			local d_p_addpos = data[p_addpos]
-			if pr:next(1, 1000) == 1 then
+			local tree_rn = pr:next(1, 1000)
+			if tree_rn == 1 then
 				tab[num] = {x=x, y=ypse+test, z=z}
 				num = num+1
 				data[p_addpos] = c_cloud
@@ -178,7 +177,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			else
 				data[p_addpos] = c_cloudstone
 			end
-			if pr:next(1, 1000) == 4 then
+			if tree_rn == 4 then
 				if pr:next(1, 1000) == 2 then
 					data[p_plantpos] = c_mese_shrub_fruits
 				else
@@ -224,6 +223,12 @@ local get_volume = function(pos1, pos2)
 	return (pos2.x - pos1.x + 1) * (pos2.y - pos1.y + 1) * (pos2.z - pos1.z + 1)
 end
 
+local c_tree = minetest.get_content_id("nyanland:mesetree")
+local c_hls = minetest.get_content_id("nyanland:healstone")
+local c_apple = minetest.get_content_id("default:apple")
+local c_leaves = minetest.get_content_id("nyanland:meseleaves")
+local c_air = minetest.get_content_id("air")
+
 function nyanland:grow_mesetree(pos)
 	local t1 = os.clock()
 	local manip = minetest.get_voxel_manip()
@@ -233,17 +238,7 @@ function nyanland:grow_mesetree(pos)
 		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
 	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
 
-	local nodes = {}
-	local ignore = minetest.get_content_id("ignore")
-	for i = 1, get_volume(emerged_pos1, emerged_pos2) do
-		nodes[i] = ignore
-	end
-
-	local c_tree = minetest.get_content_id("nyanland:mesetree")
-	local c_hls = minetest.get_content_id("nyanland:healstone")
-	local c_apple = minetest.get_content_id("default:apple")
-	local c_leaves = minetest.get_content_id("nyanland:meseleaves")
-	local c_air = minetest.get_content_id("air")
+	local nodes = manip:get_data()
 
 	--TRUNK
 	pos.y=pos.y+1
@@ -253,10 +248,10 @@ function nyanland:grow_mesetree(pos)
 	for y=pos.y, pos.y+4+tran do
 		trunkpos.y=y
 		p_trunkpos=area:index(trunkpos.x, trunkpos.y, trunkpos.z)
-		if math.random(200)>1 then
-			nodes[p_trunkpos] = c_tree
-		else
+		if math.random(200) == 1 then
 			nodes[p_trunkpos] = c_hls
+		else
+			nodes[p_trunkpos] = c_tree
 		end
 	end
 	--LEAVES
@@ -265,16 +260,12 @@ function nyanland:grow_mesetree(pos)
 		for y=(trunkpos.y-NYANLAND_TREESIZE), (trunkpos.y+NYANLAND_TREESIZE), 1 do
 			for z=(trunkpos.z-NYANLAND_TREESIZE), (trunkpos.z+NYANLAND_TREESIZE), 1 do
 				if (x-trunkpos.x)^2+(y-trunkpos.y)^2+(z-trunkpos.z)^2<= NYANLAND_TREESIZE^2 + NYANLAND_TREESIZE then	
-					leafpos={x=x, y=y, z=z}
-					p_leafpos=area:index(leafpos.x, leafpos.y, leafpos.z)
-					if minetest.get_node(leafpos).name=="air"
-					and nodes[p_leafpos]==ignore then
-						if pr:next(1,5)==1 then
-							if pr:next(1,2)==1 then
-								nodes[p_leafpos] = c_apple
-							end
-						else
+					p_leafpos=area:index(x, y, z)
+					if nodes[p_leafpos] == c_air then
+						if pr:next(1,5) ~= 1 then
 							nodes[p_leafpos] = c_leaves
+						elseif pr:next(1,11) == 1 then
+							nodes[p_leafpos] = c_apple
 						end
 					end				
 				end
@@ -284,7 +275,7 @@ function nyanland:grow_mesetree(pos)
 	manip:set_data(nodes)
 	manip:write_to_map()
 	if info then
-		print(string.format("[nyanland] a mesetree grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fms", (os.clock() - t1) * 1000))
+		print(string.format("[nyanland] a mesetree grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fs", os.clock() - t1))
 	end
 	manip:update_map()	--calc shadows
 end
