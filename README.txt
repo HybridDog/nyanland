@@ -1,11 +1,34 @@
-------Nyancat heaven------
+------Nyancat's heaven reworked------
 
-Sound sources:
+Code:
+
+GPLv3, WTFPL (for the changes)
+
+
+Textures:
+
+CC-SA, WTFPL (for the changes)
+
+
+Sounds:
+
+CC by 3.0:
+
 — http://www.freesound.org/people/dobroide/sounds/95698/
 — http://www.freesound.org/people/Kyster/sounds/79114/
-— http://www.freesound.org/people/oliver%20eye/sounds/56380/
 — http://www.freesound.org/people/Kyster/sounds/82275/
+
+
+Sampling Plus 1.0
+
+— http://www.freesound.org/people/oliver%20eye/sounds/56380/
+
+
+Unknown License:
+
 — irc(freenode.net)
+
 
 TODO:
 — allow getting back
+— find out the license of the irc generated sounds
