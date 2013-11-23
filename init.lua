@@ -152,36 +152,38 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local data = vm:get_data()
 	local area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
 
-	local perlin1 = minetest.get_perlin(13,3, 0.5, 500)	--Get map specific perlin
-	local perlin2 = minetest.get_perlin(133,3, 0.5, 100)
+	local perlin1 = minetest.get_perlin(13, 3, 0.5, 500)	--Get map specific perlin
+	local perlin2 = minetest.get_perlin(133, 3, 0.5, 100)
 
 	local num = 1
 	local tab = {}
 
 	for x=minp.x, maxp.x, 1 do
 		for z=minp.z, maxp.z, 1 do
-			local test = math.floor(perlin1:get2d({x=x, y=z})*3+0.5)
-			local test2 = math.floor(perlin2:get2d({x=x, y=z})*1000+0.5)
-			local p_addpos = area:index(x, ypse+test, z)
-			local p_plantpos = area:index(x, ypse+test+1, z)
-			local d_p_addpos = data[p_addpos]
-			local tree_rn = pr:next(1, 1000)
-			if tree_rn == 1 then
-				tab[num] = {x=x, y=ypse+test, z=z}
-				num = num+1
-				data[p_addpos] = c_cloud
-			elseif pr:next(1, 5000) == 1 then
-				data[p_addpos] = c_clonestone
-			elseif pr:next(1, 300) == 1 then
-				data[p_addpos] = c_cloudstone2
-			else
-				data[p_addpos] = c_cloudstone
-			end
-			if tree_rn == 4 then
-				if pr:next(1, 1000) == 2 then
-					data[p_plantpos] = c_mese_shrub_fruits
+			local test2 = math.abs(perlin2:get2d({x=x, y=z}))
+			if test2 >= 0.2 then
+				local test = math.floor(perlin1:get2d({x=x, y=z})*3+0.5)
+				local p_addpos = area:index(x, ypse+test, z)
+				local p_plantpos = area:index(x, ypse+test+1, z)
+				local d_p_addpos = data[p_addpos]
+				local tree_rn = pr:next(1, 1000)
+				if tree_rn == 1 then
+					tab[num] = {x=x, y=ypse+test, z=z}
+					num = num+1
+					data[p_addpos] = c_cloud
+				elseif pr:next(1, 5000) == 1 then
+					data[p_addpos] = c_clonestone
+				elseif pr:next(1, 300) == 1 then
+					data[p_addpos] = c_cloudstone2
 				else
-					data[p_plantpos] = c_mese_shrub
+					data[p_addpos] = c_cloudstone
+				end
+				if tree_rn == 4 then
+					if pr:next(1, 1000) == 2 then
+						data[p_plantpos] = c_mese_shrub_fruits
+					else
+						data[p_plantpos] = c_mese_shrub
+					end
 				end
 			end
 		end
@@ -189,7 +191,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	vm:set_data(data)
 	--vm:set_lighting({day=0, night=0})
-	vm:calc_lighting()
+	--vm:calc_lighting()
 	vm:update_liquids()
 	vm:write_to_map()
 
@@ -229,7 +231,7 @@ local c_apple = minetest.get_content_id("default:apple")
 local c_leaves = minetest.get_content_id("nyanland:meseleaves")
 local c_air = minetest.get_content_id("air")
 
-function nyanland:grow_mesetree(pos)
+function nyanland:grow_mesetree(pos, generated)
 	local t1 = os.clock()
 	local manip = minetest.get_voxel_manip()
 	local vwidth = NYANLAND_TREESIZE
@@ -275,9 +277,15 @@ function nyanland:grow_mesetree(pos)
 	manip:set_data(nodes)
 	manip:write_to_map()
 	if info then
-		print(string.format("[nyanland] a mesetree grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fs", os.clock() - t1))
+		print(string.format("[nyanland] a mesetree grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") after: %.2fs", os.clock() - t1))
+		t1 = os.clock()
 	end
-	manip:update_map()	--calc shadows
+	if not generated then
+		manip:update_map()	--calc shadows
+		if info then
+			print(string.format("[nyanland] map updated after: %.2fs", os.clock() - t1))
+		end
+	end
 end
 
 --MOVING NYAN CATS
