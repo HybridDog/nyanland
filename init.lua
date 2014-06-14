@@ -1,3 +1,4 @@
+local load_time_start = os.clock()
 NYANLAND_HEIGHT=30688
 NYANCAT_PROP=1
 NYANLAND_TREESIZE=2
@@ -50,6 +51,7 @@ minetest.register_node("nyanland:mese_shrub", {
 	inventory_image = "nyanland_mese_shrub.png",
 	wield_image = "nyanland_mese_shrub.png",
 	paramtype = "light",
+	waving = 1,
 	walkable = false,
 	buildable_to = true,
 	groups = {snappy=3,flammable=3,attached_node=1},
@@ -67,6 +69,7 @@ minetest.register_node("nyanland:mese_shrub_fruits", {
 	inventory_image = "nyanland_mese_shrub_fruits.png",
 	wield_image = "nyanland_mese_shrub_fruits.png",
 	paramtype = "light",
+	waving = 1,
 	walkable = false,
 	buildable_to = true,
 	groups = {snappy=3,flammable=3,attached_node=1},
@@ -386,3 +389,4 @@ minetest.register_entity("nyanland:mese", {
 })
 
 dofile(minetest.get_modpath("nyanland").."/portal.lua")
+print(string.format("[nyanland] loaded after ca. %.2fs", os.clock() - load_time_start))
