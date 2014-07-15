@@ -27,6 +27,7 @@ Sampling Plus 1.0
 Unknown License:
 
 — irc(freenode.net)
+— footstep sounds edited from default gravel sounds
 
 
 TODO:

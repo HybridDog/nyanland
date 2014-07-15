@@ -7,6 +7,12 @@ local info = true
 local nyanland={}
 
 --Cloudstone
+local cloudstone_sounds = {
+	dug = {name="default_dug_node", gain=0.25},
+	place = {name="default_place_node_hard", gain=0.1},
+	footstep = {name="nyanland_cloud_footstep", gain=0.05}
+}
+
 minetest.register_node("nyanland:cloudstone", {
 	tiles = {"nyanland_cloudstone.png"},
 	inventory_image = minetest.inventorycube("nyanland_cloudstone.png"),
@@ -14,6 +20,7 @@ minetest.register_node("nyanland:cloudstone", {
 	sunlight_propagates = true,
 	light_source = 10,
 	groups = {dig_immediate = 3},
+	sounds = cloudstone_sounds
 })
 
 minetest.register_node("nyanland:cloudstone_var", {
@@ -24,6 +31,7 @@ minetest.register_node("nyanland:cloudstone_var", {
 	drop = '',
 	light_source = 10,
 	groups = {dig_immediate = 3},
+	sounds = cloudstone_sounds
 })
 
 
