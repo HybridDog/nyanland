@@ -2,7 +2,7 @@ local load_time_start = os.clock()
 NYANLAND_HEIGHT=30688
 NYANCAT_PROP=1
 NYANLAND_TREESIZE=2
-local info = true
+local info = minetest.is_singleplayer()
 
 local nyanland={}
 
@@ -147,6 +147,25 @@ local c_cloud = minetest.get_content_id("default:cloud")
 
 local ypse = NYANLAND_HEIGHT
 
+local hole = {
+	seed = 13,
+	octaves = 3,
+	persist = 0.5,
+	spread = {x=500, y=500, z=500},
+	scale = 1,
+	offset = 0,
+}
+
+local height = {
+	seed = 133,
+	octaves = 3,
+	persist = 0.5,
+	spread = {x=100, y=100, z=100},
+	scale = 1,
+	offset = 0,
+}
+
+
 minetest.register_on_generated(function(minp, maxp, seed)
 	if (minp.y >= ypse+10 or maxp.y <= ypse-10) then
 		return
@@ -163,17 +182,22 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local data = vm:get_data()
 	local area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
 
-	local perlin1 = minetest.get_perlin(13, 3, 0.5, 500)	--Get map specific perlin
-	local perlin2 = minetest.get_perlin(133, 3, 0.5, 100)
+	local side_length = maxp.x - minp.x + 1
+	local map_lengths_xyz = {x=side_length, y=side_length, z=side_length}
+
+	local pmap1 = minetest.get_perlin_map(hole, map_lengths_xyz):get2dMap_flat(minp)
+	local pmap2 = minetest.get_perlin_map(height, map_lengths_xyz):get2dMap_flat(minp)
 
 	local num = 1
 	local tab = {}
 
-	for x=minp.x, maxp.x, 1 do
-		for z=minp.z, maxp.z, 1 do
-			local test2 = math.abs(perlin2:get2d({x=x, y=z}))
+	local count = 0
+	for z=minp.z, maxp.z, 1 do
+		for x=minp.x, maxp.x, 1 do
+			count = count+1
+			local test2 = math.abs(pmap2[count])
 			if test2 >= 0.2 then
-				local test = math.floor(perlin1:get2d({x=x, y=z})*3+0.5)
+				local test = math.floor(pmap1[count]*3+0.5)
 				local p_addpos = area:index(x, ypse+test, z)
 				local p_plantpos = area:index(x, ypse+test+1, z)
 				local d_p_addpos = data[p_addpos]
