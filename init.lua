@@ -174,7 +174,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	if info then
 		t1 = os.clock()
 		local geninfo = "[nyanland] generates: x=["..minp.x.."; "..maxp.x.."]; y=["..minp.y.."; "..maxp.y.."]; z=["..minp.z.."; "..maxp.z.."]"
-		print(geninfo)
+		minetest.log("info", geninfo)
 		minetest.chat_send_all(geninfo)
 	end
 	local pr = PseudoRandom(seed+112)
@@ -241,7 +241,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 	if info then
 		local geninfo = string.format("[nyanland] done after: %.2fs", os.clock() - t1)
-		print(geninfo)
+		minetest.log("info", geninfo)
 		minetest.chat_send_all(geninfo)
 	end
 end)
@@ -312,13 +312,13 @@ function nyanland:grow_mesetree(pos, generated)
 	manip:set_data(nodes)
 	manip:write_to_map()
 	if info then
-		print(string.format("[nyanland] a mesetree grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") after: %.2fs", os.clock() - t1))
+		minetest.log("info", string.format("[nyanland] a mesetree grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") after: %.2fs", os.clock() - t1))
 		t1 = os.clock()
 	end
 	if not generated then
 		manip:update_map()	--calc shadows
 		if info then
-			print(string.format("[nyanland] map updated after: %.2fs", os.clock() - t1))
+			minetest.log("info", string.format("[nyanland] map updated after: %.2fs", os.clock() - t1))
 		end
 	end
 end
@@ -421,4 +421,4 @@ minetest.register_entity("nyanland:mese", {
 })
 
 dofile(minetest.get_modpath("nyanland").."/portal.lua")
-print(string.format("[nyanland] loaded after ca. %.2fs", os.clock() - load_time_start))
+minetest.log("info", string.format("[nyanland] loaded after ca. %.2fs", os.clock() - load_time_start))
