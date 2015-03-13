@@ -230,7 +230,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	vm:update_liquids()
 	vm:write_to_map()
 
-	for _,v in ipairs(tab) do
+	for _,v in pairs(tab) do
 		nyanland:grow_mesetree(v)
 	end
 
@@ -328,8 +328,8 @@ minetest.register_abm(
 	{nodenames = {"default:nyancat"},
 	interval = 10,
 	chance = 100,
-	action = function(pos, node, active_object_count, active_object_count_wider)
-		if pos.y>NYANLAND_HEIGHT then
+	action = function(pos)
+		if pos.y > NYANLAND_HEIGHT then
 			minetest.remove_node(pos)
 			minetest.add_entity(pos, "nyanland:head_entity")
 			minetest.sound_play("nyanland_cat", {pos = pos,	gain = 0.9,	max_hear_distance = 35})
