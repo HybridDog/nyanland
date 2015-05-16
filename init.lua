@@ -140,6 +140,36 @@ minetest.register_abm({
 })
 
 
+-- Weierstrass function stuff from https://github.com/slemonide/gen
+local SIZE = 1000
+local ssize = math.ceil(math.abs(SIZE))
+local function do_ws_func(depth, a, x)
+	local n = x/(16*SIZE)
+	local y = 0
+	for k=1,depth do
+		y = y + SIZE*(math.sin(math.pi * k^a * n)/(math.pi * k^a))
+	end
+	return y
+end
+
+local chunksize = minetest.setting_get("chunksize") or 5
+local ws_lists = {}
+local function get_ws_list(a,x)
+        ws_lists[a] = ws_lists[a] or {}
+        local v = ws_lists[a][x]
+        if v then
+                return v
+        end
+        v = {}
+        for x=x,x + (chunksize*16 - 1) do
+		local y = do_ws_func(ssize, a, x)
+                v[x] = y
+        end
+        ws_lists[a][x] = v
+        return v
+end
+
+
 local generate_mesetree
 
 local c_cloudstone = minetest.get_content_id("nyanland:cloudstone")
@@ -148,6 +178,8 @@ local c_clonestone = minetest.get_content_id("nyanland:clonestone")
 local c_mese_shrub = minetest.get_content_id("nyanland:mese_shrub")
 local c_mese_shrub_fruits = minetest.get_content_id("nyanland:mese_shrub_fruits")
 local c_cloud = minetest.get_content_id("default:cloud")
+local c_mese = minetest.get_content_id("default:mese")
+local c_ice = minetest.get_content_id("default:ice")
 
 local ypse = NYANLAND_HEIGHT
 
@@ -191,6 +223,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	local pmap1 = minetest.get_perlin_map(hole, map_lengths_xyz):get2dMap_flat({x=minp.x, y=minp.z})
 	local pmap2 = minetest.get_perlin_map(height, map_lengths_xyz):get2dMap_flat({x=minp.x, y=minp.z})
+	local strassx = get_ws_list(3, minp.x)
+	local strassz = get_ws_list(5, minp.z)
+	local strassnx = get_ws_list(2, minp.x)
+	local strassnz = get_ws_list(2, minp.z)
 
 	local num = 1
 	local tab = {}
@@ -204,25 +240,37 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				local y = ypse + math.floor(pmap1[count]*3+0.5)
 				if y <= maxp.y
 				and y >= minp.y then
-					local p_addpos = area:index(x, y, z)
+					local depth = math.floor(((strassx[x]+strassz[z])%14)*math.min((test2-0.2)*25/4, 1)+0.5)
+					if depth ~= 0 then
+						local sel = math.floor(strassnx[x]+strassnz[z]+0.5)%10
+						local p = area:index(x, y-depth, z)
+						if sel <= 5 then
+							data[p] = c_cloudstone
+						elseif sel == 6 then
+							data[p] = c_ice
+						elseif sel == 7 then
+							data[p] = c_mese
+						end
+					end
+					local p = area:index(x, y, z)
 					local tree_rn = pr:next(1, 1000)
 					if tree_rn == 1 then
 						tab[num] = {x=x, y=y+1, z=z}
 						num = num+1
-						data[p_addpos] = c_cloud
+						data[p] = c_cloud
 					elseif pr:next(1, 5000) == 1 then
-						data[p_addpos] = c_clonestone
+						data[p] = c_clonestone
 					elseif pr:next(1, 300) == 1 then
-						data[p_addpos] = c_cloudstone2
+						data[p] = c_cloudstone2
 					else
-						data[p_addpos] = c_cloudstone
+						data[p] = c_cloudstone
 					end
 					if tree_rn == 4 then
-						local p_plantpos = area:index(x, y+1, z)
+						local p = area:index(x, y+1, z)
 						if pr:next(1, 1000) == 2 then
-							data[p_plantpos] = c_mese_shrub_fruits
+							data[p] = c_mese_shrub_fruits
 						else
-							data[p_plantpos] = c_mese_shrub
+							data[p] = c_mese_shrub
 						end
 					end
 				end
