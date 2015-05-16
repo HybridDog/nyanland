@@ -1,5 +1,3 @@
-------Nyancat's heaven reworked------
-
 Code:
 
 GPLv3, WTFPL (for the changes)
@@ -28,8 +26,3 @@ Unknown License:
 
 — irc(freenode.net)
 — footstep sounds edited from default gravel sounds
-
-
-TODO:
-— allow getting back
-— find out the license of the irc generated sounds

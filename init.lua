@@ -90,10 +90,13 @@ minetest.register_node("nyanland:mese_shrub_fruits", {
 
 -- Clonestone
 local function clone_node(pos)
-	local node_over = minetest.get_node({x=pos.x, y=pos.y+1, z=pos.z}).name
+	local nd = minetest.get_node({x=pos.x, y=pos.y+1, z=pos.z})
+	local node_over = nd.name
 	if node_over ~= "air"
-	and node_over ~= "nyanland:clonestone" then
-		minetest.add_node(pos, {name=node_over})
+	and node_over ~= "ignore"
+	and node_over ~= "nyanland:clonestone"
+	and minetest.registered_nodes[node_over] then
+		minetest.add_node(pos, nd)
 	end
 --	nodeupdate(pos)
 end
@@ -123,13 +126,12 @@ minetest.register_node("nyanland:healstone", {
 	groups = {cracky = 1},
 })
 
-minetest.register_abm(
-	{nodenames = {"nyanland:healstone"},
+minetest.register_abm({
+	nodenames = {"nyanland:healstone"},
 	interval = 1.0,
 	chance = 1,
 	action = function(pos)
-		local objs = minetest.get_objects_inside_radius(pos, 3)
-		for k, obj in pairs(objs) do
+		for _, obj in pairs(minetest.get_objects_inside_radius(pos, 3)) do
 			local hp = obj:get_hp()
 			if hp >= 20 then return end
 			obj:set_hp(hp+2)
@@ -137,6 +139,8 @@ minetest.register_abm(
 	end,
 })
 
+
+local generate_mesetree
 
 local c_cloudstone = minetest.get_content_id("nyanland:cloudstone")
 local c_cloudstone2 = minetest.get_content_id("nyanland:cloudstone_var")
@@ -185,54 +189,56 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local side_length = maxp.x - minp.x + 1
 	local map_lengths_xyz = {x=side_length, y=side_length, z=side_length}
 
-	local pmap1 = minetest.get_perlin_map(hole, map_lengths_xyz):get2dMap_flat(minp)
-	local pmap2 = minetest.get_perlin_map(height, map_lengths_xyz):get2dMap_flat(minp)
+	local pmap1 = minetest.get_perlin_map(hole, map_lengths_xyz):get2dMap_flat({x=minp.x, y=minp.z})
+	local pmap2 = minetest.get_perlin_map(height, map_lengths_xyz):get2dMap_flat({x=minp.x, y=minp.z})
 
 	local num = 1
 	local tab = {}
 
 	local count = 0
-	for z=minp.z, maxp.z, 1 do
-		for x=minp.x, maxp.x, 1 do
+	for z=minp.z, maxp.z do
+		for x=minp.x, maxp.x do
 			count = count+1
 			local test2 = math.abs(pmap2[count])
 			if test2 >= 0.2 then
-				local test = math.floor(pmap1[count]*3+0.5)
-				local p_addpos = area:index(x, ypse+test, z)
-				local p_plantpos = area:index(x, ypse+test+1, z)
-				local d_p_addpos = data[p_addpos]
-				local tree_rn = pr:next(1, 1000)
-				if tree_rn == 1 then
-					tab[num] = {x=x, y=ypse+test, z=z}
-					num = num+1
-					data[p_addpos] = c_cloud
-				elseif pr:next(1, 5000) == 1 then
-					data[p_addpos] = c_clonestone
-				elseif pr:next(1, 300) == 1 then
-					data[p_addpos] = c_cloudstone2
-				else
-					data[p_addpos] = c_cloudstone
-				end
-				if tree_rn == 4 then
-					if pr:next(1, 1000) == 2 then
-						data[p_plantpos] = c_mese_shrub_fruits
+				local y = ypse + math.floor(pmap1[count]*3+0.5)
+				if y <= maxp.y
+				and y >= minp.y then
+					local p_addpos = area:index(x, y, z)
+					local tree_rn = pr:next(1, 1000)
+					if tree_rn == 1 then
+						tab[num] = {x=x, y=y+1, z=z}
+						num = num+1
+						data[p_addpos] = c_cloud
+					elseif pr:next(1, 5000) == 1 then
+						data[p_addpos] = c_clonestone
+					elseif pr:next(1, 300) == 1 then
+						data[p_addpos] = c_cloudstone2
 					else
-						data[p_plantpos] = c_mese_shrub
+						data[p_addpos] = c_cloudstone
+					end
+					if tree_rn == 4 then
+						local p_plantpos = area:index(x, y+1, z)
+						if pr:next(1, 1000) == 2 then
+							data[p_plantpos] = c_mese_shrub_fruits
+						else
+							data[p_plantpos] = c_mese_shrub
+						end
 					end
 				end
 			end
 		end
 	end
 
-	vm:set_data(data)
-	--vm:set_lighting({day=0, night=0})
-	--vm:calc_lighting()
-	vm:update_liquids()
-	vm:write_to_map()
-
-	for _,v in pairs(tab) do
-		nyanland:grow_mesetree(v)
+	for _,p in pairs(tab) do
+		generate_mesetree(p, data, area, pr)
 	end
+
+	vm:set_data(data)
+	vm:set_lighting({day=0, night=0})
+	vm:calc_lighting()
+	--vm:update_liquids()
+	vm:write_to_map()
 
 	if math.random(NYANCAT_PROP)==1 then
 		local nyan_headpos={}
@@ -256,72 +262,75 @@ function nyanland:add_nyancat(nyan_headpos)
 	end
 end
 
-local get_volume = function(pos1, pos2)
-	return (pos2.x - pos1.x + 1) * (pos2.y - pos1.y + 1) * (pos2.z - pos1.z + 1)
-end
-
 local c_tree = minetest.get_content_id("nyanland:mesetree")
 local c_hls = minetest.get_content_id("nyanland:healstone")
 local c_apple = minetest.get_content_id("default:apple")
 local c_leaves = minetest.get_content_id("nyanland:meseleaves")
 local c_air = minetest.get_content_id("air")
+local c_ignore = minetest.get_content_id("ignore")
 
-function nyanland:grow_mesetree(pos, generated)
-	local t1 = os.clock()
-	local manip = minetest.get_voxel_manip()
-	local vwidth = NYANLAND_TREESIZE
-	local vheight = 7+vwidth
-	local emerged_pos1, emerged_pos2 = manip:read_from_map({x=pos.x-vwidth, y=pos.y, z=pos.z-vwidth},
-		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
-	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
-
-	local nodes = manip:get_data()
-
-	--TRUNK
-	pos.y=pos.y+1
-	local pr = PseudoRandom(math.abs(pos.x+pos.y*3+pos.z*5))
-	local trunkpos={x=pos.x, z=pos.z}
-	local tran=math.random(2)
-	for y=pos.y, pos.y+4+tran do
-		trunkpos.y=y
-		p_trunkpos=area:index(trunkpos.x, trunkpos.y, trunkpos.z)
-		if math.random(200) == 1 then
-			nodes[p_trunkpos] = c_hls
+local function mesetree(pos, tran, nodes, area, pr)
+	-- stem
+	local head_y = pos.y+4+tran
+	for y = pos.y, head_y do
+		p = area:index(pos.x, y, pos.z)
+		if pr:next(1,200) == 1 then
+			nodes[p] = c_hls
 		else
-			nodes[p_trunkpos] = c_tree
+			nodes[p] = c_tree
 		end
 	end
-	--LEAVES
-	local leafpos={}
-	for x=(trunkpos.x-NYANLAND_TREESIZE), (trunkpos.x+NYANLAND_TREESIZE), 1 do
-		for y=(trunkpos.y-NYANLAND_TREESIZE), (trunkpos.y+NYANLAND_TREESIZE), 1 do
-			for z=(trunkpos.z-NYANLAND_TREESIZE), (trunkpos.z+NYANLAND_TREESIZE), 1 do
-				if (x-trunkpos.x)^2+(y-trunkpos.y)^2+(z-trunkpos.z)^2<= NYANLAND_TREESIZE^2 + NYANLAND_TREESIZE then	
-					p_leafpos=area:index(x, y, z)
-					if nodes[p_leafpos] == c_air then
+	-- head
+	local s = NYANLAND_TREESIZE
+	for x = -s, s do
+		for y = -s, s do
+			for z = -s, s do
+				if x*x + y*y + z*z <= s*s + s then
+					local p = area:index(pos.x+x, head_y+y, pos.z+z)
+					if nodes[p] == c_air
+					or nodes[p] == c_ignore then
 						if pr:next(1,5) ~= 1 then
-							nodes[p_leafpos] = c_leaves
+							nodes[p] = c_leaves
 						elseif pr:next(1,11) == 1 then
-							nodes[p_leafpos] = c_apple
+							nodes[p] = c_apple
 						end
 					end				
 				end
 			end
 		end
 	end
+end
+
+function generate_mesetree(pos, nodes, area, pr)
+	mesetree(pos, pr:next(1,2), nodes, area, pr)
+end
+
+--[[function nyanland:grow_mesetree(pos)
+	local t1 = os.clock()
+
+	local manip = minetest.get_voxel_manip()
+	local vwidth = NYANLAND_TREESIZE
+	local vheight = 7+vwidth
+	local emerged_pos1, emerged_pos2 = manip:read_from_map({x=pos.x-vwidth, y=pos.y, z=pos.z-vwidth},
+		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
+	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
+	local nodes = manip:get_data()
+
+	local pr = PseudoRandom(math.abs(pos.x+pos.y*3+pos.z*5))
+
+	mesetree(pos, pr:next(1,2), nodes, area, pr)
+
 	manip:set_data(nodes)
 	manip:write_to_map()
 	if info then
 		minetest.log("info", string.format("[nyanland] a mesetree grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") after: %.2fs", os.clock() - t1))
 		t1 = os.clock()
 	end
-	if not generated then
-		manip:update_map()	--calc shadows
-		if info then
-			minetest.log("info", string.format("[nyanland] map updated after: %.2fs", os.clock() - t1))
-		end
+	manip:update_map()	--calc shadows
+	if info then
+		minetest.log("info", string.format("[nyanland] map updated after: %.2fs", os.clock() - t1))
 	end
-end
+end]]
 
 --MOVING NYAN CATS
 minetest.register_abm(
