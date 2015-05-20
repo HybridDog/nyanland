@@ -90,13 +90,17 @@ minetest.register_node("nyanland:mese_shrub_fruits", {
 
 -- Clonestone
 local function clone_node(pos)
-	local nd = minetest.get_node({x=pos.x, y=pos.y+1, z=pos.z})
+	pos.y = pos.y+1
+	local nd = minetest.get_node(pos)
 	local node_over = nd.name
 	if node_over ~= "air"
 	and node_over ~= "ignore"
 	and node_over ~= "nyanland:clonestone"
 	and minetest.registered_nodes[node_over] then
+		local metacontent = minetest.get_meta(pos):to_table()
+		pos.y = pos.y-1
 		minetest.add_node(pos, nd)
+		minetest.get_meta(pos):from_table(metacontent)
 	end
 --	nodeupdate(pos)
 end
@@ -106,6 +110,7 @@ minetest.register_node("nyanland:clonestone", {
 	inventory_image = minetest.inventorycube("nyanland_clonestone.png"),
 	furnace_burntime = 100,
 	groups = {cracky = 1},
+	on_construct = clone_node,
 })
 
 minetest.register_abm({
@@ -300,13 +305,12 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 end)
 
-function nyanland:add_nyancat(nyan_headpos)
-	local nyan_tailpos={}
-	minetest.add_node(nyan_headpos, {name="default:nyancat"})
-	local length=math.random(4,15)
-	for z=nyan_headpos.z+1, nyan_headpos.z+length, 1 do
-		nyan_tailpos={x=nyan_headpos.x, y=nyan_headpos.y, z=z}
-		minetest.add_node(nyan_tailpos, {name="default:nyancat_rainbow"})
+function nyanland:add_nyancat(pos)
+	minetest.add_node(pos, {name="default:nyancat"})
+	local length = math.random(4,15)
+	for _ = 1, length do
+		pos.z = pos.z+1
+		minetest.add_node(pos, {name="default:nyancat_rainbow"})
 	end
 end
 
@@ -381,29 +385,31 @@ end
 end]]
 
 --MOVING NYAN CATS
-minetest.register_abm(
-	{nodenames = {"default:nyancat"},
+minetest.register_abm({
+	nodenames = {"default:nyancat"},
 	interval = 10,
 	chance = 100,
 	action = function(pos)
 		if pos.y > NYANLAND_HEIGHT then
 			minetest.remove_node(pos)
 			minetest.add_entity(pos, "nyanland:head_entity")
-			minetest.sound_play("nyanland_cat", {pos = pos,	gain = 0.9,	max_hear_distance = 35})
+			minetest.sound_play("nyanland_cat", {pos = pos,	gain = 0.9, max_hear_distance = 35})
 		end
 	end,
 })
 
 minetest.register_entity("nyanland:head_entity", {
-	physical = false,
+	physical = true,
 	visual = "sprite",
 	timer=0,
+	lastpos = {x=0, y=0, z=0},
 	textures = {"default_nc_side.png", "default_nc_side.png", "default_nc_side.png",
 		"default_nc_side.png", "default_nc_back.png", "default_nc_front.png"},
 	collisionbox = {-0.5,-0.5,-0.5, 0.5,0.5,0.5},
 	visual = "cube",
 	on_activate = function(self, staticdata)
 		self.object:setvelocity({x=0, y=0, z=-2})
+		self.lastpos = vector.round(self.object:getpos())
 	end,
 
 	on_punch = function(self, hitter)
@@ -413,26 +419,32 @@ minetest.register_entity("nyanland:head_entity", {
 	end,
 
 	on_step = function(self, dtime)
-		local pos = self.object:getpos()
-		local pos = {x=math.floor(pos.x+0.5), y=math.floor(pos.y+0.5), z=math.floor(pos.z+0.5)}
-		self.timer=self.timer+dtime
-		if self.timer>=16 then	
-			minetest.add_node(pos, {name="default:nyancat"})
+		self.timer = self.timer+dtime
+		if self.timer >= 16 then	
+			minetest.add_node(self.lastpos, {name="default:nyancat"})
 			self.object:remove()
 			return
 		end
+		local pos = vector.round(self.object:getpos())
+		if vector.equals(self.lastpos, pos) then
+			return
+		end
+		self.lastpos = pos
 		if minetest.get_node(pos).name == "default:nyancat_rainbow" then	
 			self.object:remove()
 			return
 		end
-		for i = math.random(6)+18,30,1 do
-			local p = {x=pos.x, y=pos.y, z=pos.z+i}
+		local p = vector.new(pos)
+		for i = math.random(6)+18,300 do
+			p.z = pos.z+i
 			if minetest.get_node(p).name == "default:nyancat_rainbow" then
 				minetest.remove_node(p)
+			else
+				break
 			end
 		end
-		for i = 1,5,1 do
-			local p = {x=pos.x, y=pos.y, z=pos.z+i}
+		for i = 1,6 do
+			p.z = pos.z+i
 			if minetest.get_node(p).name == "air" then
 				minetest.add_node(p, {name="default:nyancat_rainbow"})
 			else
@@ -460,14 +472,14 @@ minetest.register_entity("nyanland:mese", {
 	textures = {"default_mese_block.png", "default_mese_block.png", "default_mese_block.png", "default_mese_block.png", "default_mese_block.png", "default_mese_block.png"},
 	on_activate = function(self)
 		self.object:setvelocity({x=0, y=-.1, z =0})
+		self.object:setacceleration({x=0, y=-9, z=0})
 	end,
 	on_step = function(self, dtime)
-		self.object:setacceleration({x=0, y=-10, z=0})
-		local pos = self.object:getpos()
+		--[[local pos = self.object:getpos()
 		local bcp = {x=pos.x, y=pos.y-0.7, z=pos.z} 
 		local bcn = minetest.get_node(bcp)
 		--if bcn.name ~= "air" then
-		--	local np = {x=bcp.x, y=bcp.y+1, z=bcp.z}
+		--	local np = {x=bcp.x, y=bcp.y+1, z=bcp.z}--]]
 		if self.object:getvelocity().y == 0 then
 			minetest.add_node(self.object:getpos(), {name="default:mese_block"})
 			self.object:remove()
