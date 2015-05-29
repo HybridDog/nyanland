@@ -295,7 +295,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	if math.random(NYANCAT_PROP)==1 then
 		local nyan_headpos={}
-		nyan_headpos={x=minp.x+pr:next(1, 80), y=ypse+pr:next(1, 20)+10, z=minp.z+pr:next(1, 80)}	
+		nyan_headpos={x=minp.x+pr:next(1, 80), y=ypse+pr:next(1, 20)+10, z=minp.z+pr:next(1, 80)}
 		nyanland:add_nyancat(nyan_headpos, minp)
 	end
 	if info then
@@ -346,7 +346,7 @@ local function mesetree(pos, tran, nodes, area, pr)
 						elseif pr:next(1,11) == 1 then
 							nodes[p] = c_apple
 						end
-					end				
+					end
 				end
 			end
 		end
@@ -420,7 +420,7 @@ minetest.register_entity("nyanland:head_entity", {
 
 	on_step = function(self, dtime)
 		self.timer = self.timer+dtime
-		if self.timer >= 16 then	
+		if self.timer >= 16 then
 			minetest.add_node(self.lastpos, {name="default:nyancat"})
 			self.object:remove()
 			return
@@ -430,7 +430,7 @@ minetest.register_entity("nyanland:head_entity", {
 			return
 		end
 		self.lastpos = pos
-		if minetest.get_node(pos).name == "default:nyancat_rainbow" then	
+		if minetest.get_node(pos).name == "default:nyancat_rainbow" then
 			self.object:remove()
 			return
 		end
@@ -476,7 +476,7 @@ minetest.register_entity("nyanland:mese", {
 	end,
 	on_step = function(self, dtime)
 		--[[local pos = self.object:getpos()
-		local bcp = {x=pos.x, y=pos.y-0.7, z=pos.z} 
+		local bcp = {x=pos.x, y=pos.y-0.7, z=pos.z}
 		local bcn = minetest.get_node(bcp)
 		--if bcn.name ~= "air" then
 		--	local np = {x=bcp.x, y=bcp.y+1, z=bcp.z}--]]
@@ -484,7 +484,7 @@ minetest.register_entity("nyanland:mese", {
 			minetest.add_node(self.object:getpos(), {name="default:mese_block"})
 			self.object:remove()
 		end
-		--	
+		--
 		--end
 	end
 })

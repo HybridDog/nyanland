@@ -86,7 +86,7 @@ minetest.register_on_generated(function(minp, maxp)
 
 		if math.random(NYANCAT_PROP)==1 then
 			local nyan_headpos={}
-			nyan_headpos={x=minp.x+math.random(80), y=minp.y+math.random(20)+10, z=minp.z+math.random(80)}	
+			nyan_headpos={x=minp.x+math.random(80), y=minp.y+math.random(20)+10, z=minp.z+math.random(80)}
 			nyanland:add_nyancat(nyan_headpos, minp)
 		end
 	end
@@ -123,15 +123,15 @@ function nyanland:grow_mesetree(pos)
 		       		if (x-trunkpos.x)*(x-trunkpos.x)
 				+(y-trunkpos.y)*(y-trunkpos.y)
 				+(z-trunkpos.z)*(z-trunkpos.z)
-				<= NYANLAND_TREESIZE*NYANLAND_TREESIZE + NYANLAND_TREESIZE then	
+				<= NYANLAND_TREESIZE*NYANLAND_TREESIZE + NYANLAND_TREESIZE then
 					leafpos={x=x, y=y, z=z}
 					if minetest.env:get_node(leafpos).name=="air" then
 						if math.random(5)==1 then
 							minetest.env:add_node(leafpos, {name="default:apple"})
 						else
 							minetest.env:add_node(leafpos, {name="nyanland:meseleaves"})
-						end				
-					end				
+						end
+					end
 				end
 			end
 		end
@@ -178,7 +178,7 @@ minetest.register_entity("nyanland:head_entity", {
 
 	on_step = function(self, dtime)
 		self.timer=self.timer+dtime
-		if self.timer>=16 then	
+		if self.timer>=16 then
 			minetest.env:add_node(self.object:getpos(), {name="default:nyancat"})
 			self.object:remove()
 		end
@@ -198,7 +198,7 @@ minetest.register_entity("nyanland:tail_entity", {
 
 	on_step = function(self, dtime)
 		self.timer=self.timer+dtime
-		if self.timer>10 then	
+		if self.timer>10 then
 			minetest.env:add_node(self.object:getpos(), {name="default:nyancat_rainbow"})
 			self.object:remove()
 		end
@@ -216,7 +216,7 @@ minetest.register_entity("nyanland:mese", {
 	on_step = function(self, dtime)
 		self.object:setacceleration({x=0, y=-10, z=0})
 		local pos = self.object:getpos()
-		local bcp = {x=pos.x, y=pos.y-0.7, z=pos.z} 
+		local bcp = {x=pos.x, y=pos.y-0.7, z=pos.z}
 		local bcn = minetest.env:get_node(bcp)
 		--if bcn.name ~= "air" then
 		--	local np = {x=bcp.x, y=bcp.y+1, z=bcp.z}
@@ -224,7 +224,7 @@ minetest.register_entity("nyanland:mese", {
 			minetest.env:add_node(self.object:getpos(), {name="default:mese_block"})
 			self.object:remove()
 		end
-		--	
+		--
 		--end
 	end
 })
