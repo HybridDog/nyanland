@@ -19,7 +19,7 @@ minetest.register_node("nyanland:cloudstone", {
 	use_texture_alpha = true,
 	sunlight_propagates = true,
 	light_source = 10,
-	groups = {dig_immediate = 3},
+	groups = {dig_immediate = 3, not_in_creative_inventory=1},
 	sounds = cloudstone_sounds
 })
 
@@ -30,7 +30,7 @@ minetest.register_node("nyanland:cloudstone_var", {
 	sunlight_propagates = true,
 	drop = '',
 	light_source = 10,
-	groups = {dig_immediate = 3},
+	groups = {dig_immediate = 3, not_in_creative_inventory=1},
 	sounds = cloudstone_sounds
 })
 
@@ -38,7 +38,7 @@ minetest.register_node("nyanland:cloudstone_var", {
 minetest.register_node("nyanland:mesetree", {
 	description = "Mese Tree",
 	tiles = {"nyanland_mesetree_top.png", "nyanland_mesetree_top.png", "nyanland_mesetree.png"},
-	groups = {tree=1,cracky=1,level=2},
+	groups = {tree=1,cracky=1,level=2, not_in_creative_inventory=1},
 	sounds = default.node_sound_stone_defaults(),
 })
 
@@ -48,7 +48,7 @@ minetest.register_node("nyanland:meseleaves", {
 	inventory_image = minetest.inventorycube("nyanland_meseleaves.png"),
 	paramtype = "light",
 	furnace_burntime = 5,
-	groups = {snappy=3, flammable=2},
+	groups = {snappy=3, flammable=2, not_in_creative_inventory=1},
 --	groups = {snappy=3, leafdecay=3, flammable=2},
 })
 
@@ -62,7 +62,7 @@ minetest.register_node("nyanland:mese_shrub", {
 	waving = 1,
 	walkable = false,
 	buildable_to = true,
-	groups = {snappy=3,flammable=3,attached_node=1},
+	groups = {snappy=3,flammable=3,attached_node=1, not_in_creative_inventory=1},
 	sounds = default.node_sound_leaves_defaults(),
 	selection_box = {
 		type = "fixed",
@@ -80,7 +80,7 @@ minetest.register_node("nyanland:mese_shrub_fruits", {
 	waving = 1,
 	walkable = false,
 	buildable_to = true,
-	groups = {snappy=3,flammable=3,attached_node=1},
+	groups = {snappy=3,flammable=3,attached_node=1, not_in_creative_inventory=1},
 	sounds = default.node_sound_leaves_defaults(),
 	selection_box = {
 		type = "fixed",
@@ -109,7 +109,7 @@ minetest.register_node("nyanland:clonestone", {
 	tiles = {"nyanland_clonestone.png"},
 	inventory_image = minetest.inventorycube("nyanland_clonestone.png"),
 	furnace_burntime = 100,
-	groups = {cracky = 1},
+	groups = {cracky = 1, not_in_creative_inventory=1},
 	on_construct = clone_node,
 })
 
@@ -128,7 +128,7 @@ minetest.register_node("nyanland:healstone", {
 	tiles = {"nyanland_healstone.png"},
 	inventory_image = minetest.inventorycube("nyanland_healstone.png"),
 	furnace_burntime = 100,
-	groups = {cracky = 1},
+	groups = {cracky = 1, not_in_creative_inventory=1},
 })
 
 minetest.register_abm({
@@ -488,6 +488,92 @@ minetest.register_entity("nyanland:mese", {
 		--end
 	end
 })
+
+
+local nt = {
+	"default_water_source_animated.png^[verticalframe:8:1"..
+		"^(default_nc_rb.png^[transformR90)"..
+		"^[transformR270"..
+		"^[transformFX"..
+		"^[combine:16x16:16,0=default_nc_rb.png^[transformR90",
+	"default_water_source_animated.png^[verticalframe:8:1"..
+		"^default_nc_rb.png"..
+		"^[transformFX"..
+		"^[combine:16x16:0,16=default_nc_rb.png",
+}
+
+for i = 1,2 do
+	nt[i] = {
+		name = nt[i],
+		animation = {
+			type = "vertical_frames",
+			aspect_w = 16,
+			aspect_h = 16,
+			length = 0.6,	-- 300ms (from nyan.cat)
+		},
+	}
+end
+
+minetest.override_item("default:nyancat_rainbow", {
+	tiles = {nt[1], nt[1], nt[2]},
+})
+
+
+minetest.register_node("nyanland:nyancat", {
+	description = "golden Nyan Cat",
+	tiles = {"default_nc_side.png", "default_nc_side.png", "default_nc_side.png",
+		"default_nc_side.png", "default_gold_block.png^nyanland_nc_back.png", "default_gold_block.png^nyanland_nc_front.png"},
+	paramtype2 = "facedir",
+	groups = {cracky=1, not_in_creative_inventory=1},
+	is_ground_content = false,
+	legacy_facedir_simple = true,
+	sounds = default.node_sound_defaults(),
+	after_place_node = function(pos, placer)
+		minetest.get_meta(pos):set_string("owner", placer:get_player_name())
+	end,
+	can_dig = function(pos,player)
+		local owner = minetest.get_meta(pos):get_string("owner")
+		if not owner
+		or owner == "" then
+			return true
+		end
+		if owner ~= player:get_player_name()
+		or not player:get_player_control().sneak then
+			return false
+		end
+		return true
+	end,
+})
+
+local punchfct = minetest.registered_nodes["nyanland:nyancat"].on_punch
+minetest.override_item("nyanland:nyancat", {
+	on_punch = function(pos, node, player, pt, ...)
+		if pt.above
+		and minetest.get_meta(pos):get_string("owner") == player:get_player_name()
+		and not player:get_player_control().sneak
+		and minetest.get_node(pt.above).name == "air" then
+			minetest.sound_play("nyanland_cat", {pos = pos,	gain = 2, max_hear_distance = 41})
+			minetest.set_node(pt.above, {name="default:goldblock"})
+		end
+		return punchfct(pos, node, player, pt, ...)
+	end,
+})
+
+local makecat = default.make_nyancat
+function default.make_nyancat(pos, facedir, length)
+	if minetest.get_node(pos).name ~= "default:stone_with_gold" then
+		return makecat(pos, facedir, length)
+	end
+	local tailvec = minetest.facedir_to_dir(facedir)
+	local p = vector.new(pos)
+	minetest.set_node(p, {name = "nyanland:nyancat", param2 = facedir})
+	for i = 1, length+5 do
+		p.x = p.x + tailvec.x
+		p.z = p.z + tailvec.z
+		minetest.set_node(p, {name = "default:nyancat_rainbow", param2 = facedir})
+	end
+end
+
 
 dofile(minetest.get_modpath("nyanland").."/portal.lua")
 minetest.log("info", string.format("[nyanland] loaded after ca. %.2fs", os.clock() - load_time_start))
