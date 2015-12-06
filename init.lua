@@ -390,8 +390,8 @@ end]]
 --MOVING NYAN CATS
 minetest.register_abm({
 	nodenames = {"default:nyancat"},
-	interval = 1,--10,
-	chance = 1,--100,
+	interval = 10,
+	chance = 100,
 	catch_up = false,
 	action = function(pos)
 		if pos.y > NYANLAND_HEIGHT then
