@@ -117,6 +117,7 @@ minetest.register_abm({
 	nodenames = {"nyanland:clonestone"},
 	interval = 5,
 	chance = 1,
+	catch_up = false,
 	action = function(pos)
 		clone_node(pos)
 	end,
@@ -212,6 +213,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		return
 	end
 
+	local t1
 	if info then
 		t1 = os.clock()
 		local geninfo = "[nyanland] generates: x=["..minp.x.."; "..maxp.x.."]; y=["..minp.y.."; "..maxp.y.."]; z=["..minp.z.."; "..maxp.z.."]"
@@ -325,7 +327,7 @@ local function mesetree(pos, tran, nodes, area, pr)
 	-- stem
 	local head_y = pos.y+4+tran
 	for y = pos.y, head_y do
-		p = area:index(pos.x, y, pos.z)
+		local p = area:index(pos.x, y, pos.z)
 		if pr:next(1,200) == 1 then
 			nodes[p] = c_hls
 		else
