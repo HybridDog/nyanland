@@ -404,21 +404,25 @@ minetest.register_abm({
 
 minetest.register_entity("nyanland:head_entity", {
 	physical = true,
-	visual = "sprite",
 	lastpos = {x=0, y=0, z=0},
 	textures = {"default_nc_side.png", "default_nc_side.png", "default_nc_side.png",
 		"default_nc_side.png", "default_nc_back.png", "default_nc_front.png"},
 	collisionbox = {-0.5,-0.5,-0.5, 0.5,0.5,0.5},
 	visual = "cube",
-	on_activate = function(self, staticdata)
+	visual_size = {x=1.001, y=1.001},
+	on_activate = function(self)
 		self.object:setvelocity({x=0, y=0, z=-2})
+		self.object:set_armor_groups({immortal=1})
 		self.lastpos = vector.round(self.object:getpos())
 		self.timer = math.random()*8-4
 	end,
 
-	on_punch = function(self, hitter)
-		local mesepos=self.object:getpos()
-		mesepos.y=mesepos.y-1
+	on_punch = function(self)
+		local mesepos = self.object:getpos()
+		if math.random(10) == 1 then
+			minetest.sound_play("nyanland_cat", {pos = mesepos,	gain = 0.9, max_hear_distance = 35})
+		end
+		mesepos.y = mesepos.y-1
 		spawn_falling_node(mesepos, {name = "default:mese_block"})
 	end,
 
@@ -429,7 +433,8 @@ minetest.register_entity("nyanland:head_entity", {
 			self.object:remove()
 			return
 		end
-		local pos = vector.round(self.object:getpos())
+		local finepos = self.object:getpos()
+		local pos = vector.round(finepos)
 		if vector.equals(self.lastpos, pos) then
 			return
 		end
@@ -446,8 +451,9 @@ minetest.register_entity("nyanland:head_entity", {
 			end
 			minetest.remove_node(p)
 		end
+		local z = math.floor(finepos.z+0.1)
 		for i = 1,6 do
-			p.z = pos.z+i
+			p.z = z+i
 			if minetest.get_node(p).name ~= "air" then
 				return
 			end
