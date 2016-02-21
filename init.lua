@@ -16,7 +16,6 @@ local cloudstone_sounds = {
 
 minetest.register_node("nyanland:cloudstone", {
 	tiles = {"nyanland_cloudstone.png"},
-	inventory_image = minetest.inventorycube("nyanland_cloudstone.png"),
 	use_texture_alpha = true,
 	sunlight_propagates = true,
 	light_source = 10,
@@ -26,7 +25,6 @@ minetest.register_node("nyanland:cloudstone", {
 
 minetest.register_node("nyanland:cloudstone_var", {
 	tiles = {"nyanland_cloudstone_var.png", "nyanland_cloudstone_var.png", "nyanland_cloudstone.png"},
-	inventory_image = minetest.inventorycube("nyanland_cloudstone_var.png"),
 	use_texture_alpha = true,
 	sunlight_propagates = true,
 	drop = '',
@@ -46,7 +44,6 @@ minetest.register_node("nyanland:mesetree", {
 minetest.register_node("nyanland:meseleaves", {
 	drawtype = "allfaces_optional",
 	tiles = {"nyanland_meseleaves.png"},
-	inventory_image = minetest.inventorycube("nyanland_meseleaves.png"),
 	paramtype = "light",
 	furnace_burntime = 5,
 	groups = {snappy=3, flammable=2, not_in_creative_inventory=1},
@@ -107,8 +104,8 @@ local function clone_node(pos)
 end
 
 minetest.register_node("nyanland:clonestone", {
+	description = "clonestone",
 	tiles = {"nyanland_clonestone.png"},
-	inventory_image = minetest.inventorycube("nyanland_clonestone.png"),
 	furnace_burntime = 100,
 	groups = {cracky = 1, not_in_creative_inventory=1},
 	on_construct = clone_node,
@@ -126,9 +123,8 @@ minetest.register_abm({
 
 -- Healstone
 minetest.register_node("nyanland:healstone", {
-	description = "nyanland:healstone",
+	description = "nyanland healstone",
 	tiles = {"nyanland_healstone.png"},
-	inventory_image = minetest.inventorycube("nyanland_healstone.png"),
 	furnace_burntime = 100,
 	groups = {cracky = 1, not_in_creative_inventory=1},
 })
