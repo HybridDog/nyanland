@@ -551,11 +551,11 @@ dofile(minetest.get_modpath("nyanland").."/portal.lua")
 -- legacy
 
 minetest.register_entity("nyanland:tail_entity", {
-	physical = false,
+	--[[physical = false,
 	visual = "sprite",
 	timer=0,
 	collisionbox = {-0.5,-0.5,-0.5, 0.5,0.5,0.5},
-	visual = "cube",
+	visual = "cube",--]]
 	on_activate = function(self)
 		self.object:remove()
 	end
