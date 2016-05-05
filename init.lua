@@ -147,12 +147,12 @@ minetest.register_abm({
 local SIZE = 1000
 local ssize = math.ceil(math.abs(SIZE))
 local function do_ws_func(depth, a, x)
-	local n = x/(16*SIZE)
+	local n = math.pi * x / (16 * SIZE)
 	local y = 0
-	for k=1,depth do
-		y = y + math.sin(math.pi * k^a * n)/(k^a)
+	for k = 1,depth do
+		y = y + math.sin(k^a * n) / k^a
 	end
-	return SIZE*y/math.pi
+	return SIZE * y / math.pi
 end
 
 local chunksize = minetest.setting_get("chunksize") or 5
