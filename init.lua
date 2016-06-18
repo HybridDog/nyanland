@@ -71,9 +71,9 @@ minetest.register_node("nyanland:mese_shrub", {
 minetest.register_node("nyanland:mese_shrub_fruits", {
 	description = "Mese Shrub with fruits",
 	drawtype = "plantlike",
-	tiles = {"nyanland_mese_shrub_fruits.png"},
-	inventory_image = "nyanland_mese_shrub_fruits.png",
-	wield_image = "nyanland_mese_shrub_fruits.png",
+	tiles = {"nyanland_mese_shrub.png^nyanland_mese_shrub_fruits.png"},
+	inventory_image = "nyanland_mese_shrub.png^nyanland_mese_shrub_fruits.png",
+	wield_image = "nyanland_mese_shrub.png^nyanland_mese_shrub_fruits.png",
 	paramtype = "light",
 	waving = 1,
 	walkable = false,
