@@ -10,6 +10,8 @@ look [here](https://github.com/HybridDog/nyanland/compare/0.3...master#files) fo
 
 If you got ideas or found bugs, please tell them to me.
 
-TODO:
-— allow getting back
-— find out the license of the irc generated sounds
+TODO:  
+— allow getting back  
+— find out the license of the irc generated sounds  
+— fix mapgen with different chunksizes  
+— update particlespawner

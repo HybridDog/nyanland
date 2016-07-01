@@ -155,7 +155,7 @@ local function do_ws_func(depth, a, x)
 	return SIZE * y / math.pi
 end
 
-local chunksize = minetest.setting_get("chunksize") or 5
+local chunksize = minetest.setting_get"chunksize" or 5
 local ws_lists = {}
 local function get_ws_list(a,x)
 	ws_lists[a] = ws_lists[a] or {}
@@ -175,14 +175,14 @@ end
 
 local generate_mesetree
 
-local c_cloudstone = minetest.get_content_id("nyanland:cloudstone")
-local c_cloudstone2 = minetest.get_content_id("nyanland:cloudstone_var")
-local c_clonestone = minetest.get_content_id("nyanland:clonestone")
-local c_mese_shrub = minetest.get_content_id("nyanland:mese_shrub")
-local c_mese_shrub_fruits = minetest.get_content_id("nyanland:mese_shrub_fruits")
-local c_cloud = minetest.get_content_id("default:cloud")
-local c_mese = minetest.get_content_id("default:mese")
-local c_ice = minetest.get_content_id("default:ice")
+local c_cloudstone = minetest.get_content_id"nyanland:cloudstone"
+local c_cloudstone2 = minetest.get_content_id"nyanland:cloudstone_var"
+local c_clonestone = minetest.get_content_id"nyanland:clonestone"
+local c_mese_shrub = minetest.get_content_id"nyanland:mese_shrub"
+local c_mese_shrub_fruits = minetest.get_content_id"nyanland:mese_shrub_fruits"
+local c_cloud = minetest.get_content_id"default:cloud"
+local c_mese = minetest.get_content_id"default:mese"
+local c_ice = minetest.get_content_id"default:ice"
 
 local ypse = NYANLAND_HEIGHT
 
@@ -218,15 +218,15 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		minetest.chat_send_all(geninfo)
 	end
 	local pr = PseudoRandom(seed+112)
-	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
+	local vm, emin, emax = minetest.get_mapgen_object"voxelmanip"
 	local data = vm:get_data()
 	local area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
 
 	local side_length = maxp.x - minp.x + 1
 	local map_lengths_xyz = {x=side_length, y=side_length, z=side_length}
 
-	local pmap1 = minetest.get_perlin_map(hole, map_lengths_xyz):get2dMap_flat({x=minp.x, y=minp.z})
-	local pmap2 = minetest.get_perlin_map(height, map_lengths_xyz):get2dMap_flat({x=minp.x, y=minp.z})
+	local pmap1 = minetest.get_perlin_map(hole, map_lengths_xyz):get2dMap_flat{x=minp.x, y=minp.z}
+	local pmap2 = minetest.get_perlin_map(height, map_lengths_xyz):get2dMap_flat{x=minp.x, y=minp.z}
 	local strassx = get_ws_list(3, minp.x)
 	local strassz = get_ws_list(5, minp.z)
 	local strassnx = get_ws_list(2, minp.x)
@@ -313,12 +313,12 @@ function nyanland:add_nyancat(pos)
 	end
 end
 
-local c_tree = minetest.get_content_id("nyanland:mesetree")
-local c_hls = minetest.get_content_id("nyanland:healstone")
-local c_apple = minetest.get_content_id("default:apple")
-local c_leaves = minetest.get_content_id("nyanland:meseleaves")
-local c_air = minetest.get_content_id("air")
-local c_ignore = minetest.get_content_id("ignore")
+local c_tree = minetest.get_content_id"nyanland:mesetree"
+local c_hls = minetest.get_content_id"nyanland:healstone"
+local c_apple = minetest.get_content_id"default:apple"
+local c_leaves = minetest.get_content_id"nyanland:meseleaves"
+local c_air = minetest.get_content_id"air"
+local c_ignore = minetest.get_content_id"ignore"
 
 local function mesetree(pos, tran, nodes, area, pr)
 	-- stem
@@ -407,8 +407,8 @@ minetest.register_entity("nyanland:head_entity", {
 	visual = "cube",
 	visual_size = {x=1.001, y=1.001},
 	on_activate = function(self)
-		self.object:setvelocity({x=0, y=0, z=-2})
-		self.object:set_armor_groups({immortal=1})
+		self.object:setvelocity{x=0, y=0, z=-2}
+		self.object:set_armor_groups{immortal=1}
 		self.lastpos = vector.round(self.object:getpos())
 		self.timer = math.random()*8-4
 	end,
@@ -519,7 +519,7 @@ local punchfct = minetest.registered_nodes["nyanland:nyancat"].on_punch
 minetest.override_item("nyanland:nyancat", {
 	on_punch = function(pos, node, player, pt, ...)
 		if pt.above
-		and minetest.get_meta(pos):get_string("owner") == player:get_player_name()
+		and minetest.get_meta(pos):get_string"owner" == player:get_player_name()
 		and not player:get_player_control().sneak
 		and minetest.get_node(pt.above).name == "air" then
 			minetest.sound_play("nyanland_cat", {pos = pos,	gain = 2, max_hear_distance = 41})
@@ -545,7 +545,7 @@ function default.make_nyancat(pos, facedir, length)
 end
 
 
-dofile(minetest.get_modpath("nyanland").."/portal.lua")
+dofile(minetest.get_modpath"nyanland".."/portal.lua")
 
 
 -- legacy

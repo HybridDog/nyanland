@@ -64,7 +64,7 @@ end
 minetest.register_on_punchnode(function(pos, node, puncher)
 	if puncher:get_wielded_item():get_name() == "default:stick"
 	and node.name == "default:mese"	--actually not necesary
-	and sandport({x=pos.x, y=pos.y-1, z=pos.z}) then
+	and sandport{x=pos.x, y=pos.y-1, z=pos.z} then
 		use_sand_portal(pos)
 	end
 end)
