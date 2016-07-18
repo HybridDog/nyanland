@@ -305,11 +305,11 @@ minetest.register_on_generated(function(minp, maxp, seed)
 end)
 
 function nyanland:add_nyancat(pos)
-	minetest.add_node(pos, {name="default:nyancat"})
+	minetest.add_node(pos, {name="nyancat:nyancat"})
 	local length = math.random(4,15)
 	for _ = 1, length do
 		pos.z = pos.z+1
-		minetest.add_node(pos, {name="default:nyancat_rainbow"})
+		minetest.add_node(pos, {name="nyancat:nyancat_rainbow"})
 	end
 end
 
@@ -385,7 +385,7 @@ end]]
 
 --MOVING NYAN CATS
 minetest.register_abm({
-	nodenames = {"default:nyancat"},
+	nodenames = {"nyancat:nyancat"},
 	interval = 10,
 	chance = 100,
 	catch_up = false,
@@ -425,7 +425,7 @@ minetest.register_entity("nyanland:head_entity", {
 	on_step = function(self, dtime)
 		self.timer = self.timer+dtime
 		if self.timer >= 16 then
-			minetest.add_node(self.lastpos, {name="default:nyancat"})
+			minetest.add_node(self.lastpos, {name="nyancat:nyancat"})
 			self.object:remove()
 			return
 		end
@@ -435,14 +435,14 @@ minetest.register_entity("nyanland:head_entity", {
 			return
 		end
 		self.lastpos = pos
-		if minetest.get_node(pos).name == "default:nyancat_rainbow" then
+		if minetest.get_node(pos).name == "nyancat:nyancat_rainbow" then
 			self.object:remove()
 			return
 		end
 		local p = vector.new(pos)
 		for i = math.random(6)+18,300 do
 			p.z = pos.z+i
-			if minetest.get_node(p).name ~= "default:nyancat_rainbow" then
+			if minetest.get_node(p).name ~= "nyancat:nyancat_rainbow" then
 				break
 			end
 			minetest.remove_node(p)
@@ -453,7 +453,7 @@ minetest.register_entity("nyanland:head_entity", {
 			if minetest.get_node(p).name ~= "air" then
 				return
 			end
-			minetest.add_node(p, {name="default:nyancat_rainbow"})
+			minetest.add_node(p, {name="nyancat:nyancat_rainbow"})
 		end
 	end
 })
@@ -486,7 +486,7 @@ end
 nt[3] = nt[2]
 nt[2] = nt[1]
 
-minetest.override_item("default:nyancat_rainbow", {tiles = nt})
+minetest.override_item("nyancat:nyancat_rainbow", {tiles = nt})
 
 
 minetest.register_node("nyanland:nyancat", {
@@ -529,8 +529,8 @@ minetest.override_item("nyanland:nyancat", {
 	end,
 })
 
-local makecat = default.make_nyancat
-function default.make_nyancat(pos, facedir, length)
+local makecat = nyancat.place
+function nyancat.place(pos, facedir, length)
 	if minetest.get_node(pos).name ~= "default:stone_with_gold" then
 		return makecat(pos, facedir, length)
 	end
@@ -540,7 +540,7 @@ function default.make_nyancat(pos, facedir, length)
 	for i = 1, length+5 do
 		p.x = p.x + tailvec.x
 		p.z = p.z + tailvec.z
-		minetest.set_node(p, {name = "default:nyancat_rainbow", param2 = facedir})
+		minetest.set_node(p, {name = "nyancat:nyancat_rainbow", param2 = facedir})
 	end
 end
 
