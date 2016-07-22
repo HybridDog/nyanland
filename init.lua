@@ -502,7 +502,7 @@ minetest.register_node("nyanland:nyancat", {
 		minetest.get_meta(pos):set_string("owner", placer:get_player_name())
 	end,
 	can_dig = function(pos,player)
-		local owner = minetest.get_meta(pos):get_string("owner")
+		local owner = minetest.get_meta(pos):get_string"owner"
 		if not owner
 		or owner == "" then
 			return true
