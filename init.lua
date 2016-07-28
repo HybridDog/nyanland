@@ -466,13 +466,13 @@ local nt = {
 		"^[transformFX"..
 		"^[combine:16x16:16,0=nyancat_rainbow.png^[transformR90",
 	"default_water_source_animated.png^[verticalframe:8:1"..
-		"^nyancat_rainbow.png"..
+		"^(nyancat_rainbow.png)"..
 		"^[transformFX"..
 		"^[combine:16x16:0,16=nyancat_rainbow.png",
 }
 
 for i = 1,2 do
-	nt[i] = {
+	nt[2*i-1] = {
 		name = nt[i],
 		animation = {
 			type = "vertical_frames",
@@ -483,7 +483,6 @@ for i = 1,2 do
 	}
 end
 
-nt[3] = nt[2]
 nt[2] = nt[1]
 
 minetest.override_item("nyancat:nyancat_rainbow", {tiles = nt})
