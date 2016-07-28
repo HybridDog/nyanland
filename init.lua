@@ -401,8 +401,8 @@ minetest.register_abm({
 minetest.register_entity("nyanland:head_entity", {
 	physical = true,
 	lastpos = {x=0, y=0, z=0},
-	textures = {"default_nc_side.png", "default_nc_side.png", "default_nc_side.png",
-		"default_nc_side.png", "default_nc_back.png", "default_nc_front.png"},
+	textures = {"nyancat_side.png", "nyancat_side.png", "nyancat_side.png",
+		"nyancat_side.png", "nyancat_back.png", "nyancat_front.png"},
 	collisionbox = {-0.5,-0.5,-0.5, 0.5,0.5,0.5},
 	visual = "cube",
 	visual_size = {x=1.001, y=1.001},
@@ -461,14 +461,14 @@ minetest.register_entity("nyanland:head_entity", {
 
 local nt = {
 	"default_water_source_animated.png^[verticalframe:8:1"..
-		"^(default_nc_rb.png^[transformR90)"..
+		"^(nyancat_rainbow.png^[transformR90)"..
 		"^[transformR270"..
 		"^[transformFX"..
-		"^[combine:16x16:16,0=default_nc_rb.png^[transformR90",
+		"^[combine:16x16:16,0=nyancat_rainbow.png^[transformR90",
 	"default_water_source_animated.png^[verticalframe:8:1"..
-		"^default_nc_rb.png"..
+		"^nyancat_rainbow.png"..
 		"^[transformFX"..
-		"^[combine:16x16:0,16=default_nc_rb.png",
+		"^[combine:16x16:0,16=nyancat_rainbow.png",
 }
 
 for i = 1,2 do
@@ -491,8 +491,8 @@ minetest.override_item("nyancat:nyancat_rainbow", {tiles = nt})
 
 minetest.register_node("nyanland:nyancat", {
 	description = "golden Nyan Cat",
-	tiles = {"default_nc_side.png", "default_nc_side.png", "default_nc_side.png",
-		"default_nc_side.png", "default_gold_block.png^nyanland_nc_back.png", "default_gold_block.png^nyanland_nc_front.png"},
+	tiles = {"nyancat_side.png", "nyancat_side.png", "nyancat_side.png",
+		"nyancat_side.png", "default_gold_block.png^nyanland_nc_back.png", "default_gold_block.png^nyanland_nc_front.png"},
 	paramtype2 = "facedir",
 	groups = {cracky=1, not_in_creative_inventory=1},
 	is_ground_content = false,
