@@ -497,20 +497,17 @@ minetest.register_node("nyanland:nyancat", {
 	is_ground_content = false,
 	legacy_facedir_simple = true,
 	sounds = default.node_sound_defaults(),
-	after_place_node = function(pos, placer)
-		minetest.get_meta(pos):set_string("owner", placer:get_player_name())
+	after_place_node = function(pos, player)
+		minetest.get_meta(pos):set_string("owner", player:get_player_name())
 	end,
-	can_dig = function(pos,player)
+	can_dig = function(pos, player)
 		local owner = minetest.get_meta(pos):get_string"owner"
-		if not owner
-		or owner == "" then
-			return true
-		end
-		if owner ~= player:get_player_name()
-		or not player:get_player_control().sneak then
-			return false
-		end
-		return true
+		return not owner
+			or owner == ""
+			or (
+				owner == player:get_player_name()
+				and player:get_player_control().sneak
+			)
 	end,
 })
 
