@@ -460,15 +460,8 @@ minetest.register_entity("nyanland:head_entity", {
 
 
 local nt = {
-	"default_water_source_animated.png^[verticalframe:8:1"..
-		"^(nyancat_rainbow.png^[transformR90)"..
-		"^[transformR270"..
-		"^[transformFX"..
-		"^[combine:16x16:16,0=nyancat_rainbow.png^[transformR90",
-	"default_water_source_animated.png^[verticalframe:8:1"..
-		"^(nyancat_rainbow.png)"..
-		"^[transformFX"..
-		"^[combine:16x16:0,16=nyancat_rainbow.png",
+	"[combine:32x16:0,0=nyancat_rainbow.png^[transformFX^[combine:32x16:0,0=nyancat_rainbow.png^[transformR90",
+	"[combine:16x32:0,0=nyancat_rainbow.png^[transformFX^[combine:16x32:0,16=nyancat_rainbow.png"
 }
 
 for i = 1,2 do
@@ -479,7 +472,7 @@ for i = 1,2 do
 			aspect_w = 16,
 			aspect_h = 16,
 			length = 0.6,	-- 300ms (from nyan.cat)
-		},
+		}
 	}
 end
 
