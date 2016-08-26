@@ -143,32 +143,32 @@ minetest.register_abm({
 })
 
 
--- Weierstrass function stuff from https://github.com/slemonide/gen
-local SIZE = 1000
-local ssize = math.ceil(math.abs(SIZE))
-local function do_ws_func(depth, a, x)
-	local n = math.pi * x / (16 * SIZE)
+-- Weierstrass function code from https://github.com/slemonide/gen
+local function do_ws_func(a, x)
+	local n = math.pi * x / 16000
 	local y = 0
-	for k = 1,depth do
-		y = y + math.sin(k^a * n) / k^a
+	for k = 1,1000 do
+		y = y + math.sin(k^a * n)/(k^a)
 	end
-	return SIZE * y / math.pi
+	return 1000*y/math.pi
 end
 
-local chunksize = minetest.setting_get"chunksize" or 5
-local ws_lists = {}
-local function get_ws_list(a,x)
-	ws_lists[a] = ws_lists[a] or {}
-	local v = ws_lists[a][x]
+-- caching function
+local ws_values = {}
+local function get_ws_value(a, x)
+	local v = ws_values[a]
 	if v then
+		v = v[x]
+		if v then
 			return v
+		end
+	else
+		ws_values[a] = {}
+		-- weak table, see https://www.lua.org/pil/17.1.html
+		setmetatable(ws_values[a], {__mode = "kv"})
 	end
-	v = {}
-	for x=x,x + (chunksize*16 - 1) do
-	local y = do_ws_func(ssize, a, x)
-			v[x] = y
-	end
-	ws_lists[a][x] = v
+	v = do_ws_func(a, x)
+	ws_values[a][x] = v
 	return v
 end
 
@@ -227,10 +227,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	local pmap1 = minetest.get_perlin_map(hole, map_lengths_xyz):get2dMap_flat{x=minp.x, y=minp.z}
 	local pmap2 = minetest.get_perlin_map(height, map_lengths_xyz):get2dMap_flat{x=minp.x, y=minp.z}
-	local strassx = get_ws_list(3, minp.x)
-	local strassz = get_ws_list(5, minp.z)
-	local strassnx = get_ws_list(2, minp.x)
-	local strassnz = get_ws_list(2, minp.z)
 
 	local num = 1
 	local tab = {}
@@ -244,9 +240,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				local y = ypse + math.floor(pmap1[count]*3+0.5)
 				if y <= maxp.y
 				and y >= minp.y then
-					local depth = math.floor(((strassx[x]+strassz[z])%14)*math.min((test2-0.2)*25/4, 1)+0.5)
+					local depth = math.floor(((get_ws_value(3, x)+get_ws_value(5, z))%14)*math.min((test2-0.2)*25/4, 1)+0.5)
 					if depth ~= 0 then
-						local sel = math.floor(strassnx[x]+strassnz[z]+0.5)%10
+						local sel = math.floor(get_ws_value(2, x)+get_ws_value(2, z)+0.5)%10
 						local p = area:index(x, y-depth, z)
 						if sel <= 5 then
 							data[p] = c_cloudstone

@@ -12,5 +12,4 @@ You are supposed to get back to surface by teleporting, e.g. /spawn chatcommand.
 If you got ideas or found bugs, please tell them to me.
 
 TODO:  
-— find out the license of the irc generated sounds  
-— fix mapgen with different chunksizes  
+— find out the license of the irc generated sounds
