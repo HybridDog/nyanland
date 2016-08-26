@@ -1,6 +1,7 @@
 [Mod] Nyancat's heaven reworked [nyanland]
 
-look [here](https://github.com/HybridDog/nyanland/compare/0.3...master#files) for the changes
+look [here](https://github.com/HybridDog/nyanland/compare/0.3...master#files) for the changes  
+You are supposed to get back to surface by teleporting, e.g. /spawn chatcommand.
 
 **Depends:** see [depends.txt](https://raw.githubusercontent.com/HybridDog/nyanland/master/depends.txt)  
 **License:** see [LICENSE.txt](https://raw.githubusercontent.com/HybridDog/nyanland/master/LICENSE.txt)  
@@ -11,7 +12,5 @@ look [here](https://github.com/HybridDog/nyanland/compare/0.3...master#files) fo
 If you got ideas or found bugs, please tell them to me.
 
 TODO:  
-— allow getting back  
 — find out the license of the irc generated sounds  
 — fix mapgen with different chunksizes  
-— update particlespawner

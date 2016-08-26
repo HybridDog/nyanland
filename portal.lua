@@ -37,20 +37,22 @@ end
 
 local function use_sand_portal(pos)
 	minetest.sound_play("nyanland_portal", {pos = pos,	gain = 0.5,	max_hear_distance = 5})
-	minetest.add_particlespawner(
-		300, --amount
-		17, --time
-		{x=pos.x-0.2, y=pos.y+0.5, z=pos.z-0.2}, --minpos
-		{x=pos.x+0.2, y=pos.y+0.4, z=pos.z+0.2}, --maxpos
-		{x=-0.2, y=-0, z=-0.2}, --minvel
-		{x=0.2, y=0, z=0.2}, --maxvel
-		{x=-0.5,y=4,z=-0.5}, --minacc
-		{x=0.5,y=5,z=0.5}, --maxacc
-		1, 10, --min&maxexptime
-		1, 9, --min&maxsize
-		true, --collisiondetection
-		"smoke_puff.png" --texture
-	)
+	minetest.add_particlespawner{
+		amount = 300,
+		time = 17,
+		minpos = {x=pos.x-0.2, y=pos.y+0.5, z=pos.z-0.2},
+		maxpos = {x=pos.x+0.2, y=pos.y+0.4, z=pos.z+0.2},
+		minvel = {x=-0.2, y=-0, z=-0.2},
+		maxvel = {x=0.2, y=0, z=0.2},
+		minacc = {x=-0.5,y=4,z=-0.5},
+		maxacc = {x=0.5,y=5,z=0.5},
+		minexptime = 1,
+		maxexptime = 10,
+		minsize = 1,
+		maxsize = 9,
+		collisiondetection = true,
+		texture = "smoke_puff.png"
+	}
 	local target_pos = {x=pos.x, y=pos.y+NYANLAND_HEIGHT+10, z=pos.z}
 	minetest.after(math.random(16), function(pos)
 		local objs = minetest.get_objects_inside_radius({x=pos.x, y=pos.y+0.5, z=pos.z}, 0.5)
