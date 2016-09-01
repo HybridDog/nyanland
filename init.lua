@@ -467,7 +467,7 @@ for i = 1,2 do
 			type = "vertical_frames",
 			aspect_w = 16,
 			aspect_h = 16,
-			length = 0.6,	-- 300ms (from nyan.cat)
+			length = 0.3
 		}
 	}
 end
