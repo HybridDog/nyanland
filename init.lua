@@ -7,6 +7,15 @@ local info = minetest.is_singleplayer()
 
 local nyanland={}
 
+minetest.register_craft({
+	output = "nyanland:mese_shrub_block",
+	recipe = {
+		{"nyanland:mese_shrub", "nyanland:mese_shrub", "nyanland:mese_shrub"},
+		{"nyanland:mese_shrub", "nyanland:mese_shrub", "nyanland:mese_shrub"},
+		{"nyanland:mese_shrub", "nyanland:mese_shrub", "nyanland:mese_shrub"},
+	}
+})
+
 --Cloudstone
 local cloudstone_sounds = {
 	dug = {name="default_dug_node", gain=0.25},
@@ -84,6 +93,13 @@ minetest.register_node("nyanland:mese_shrub_fruits", {
 		type = "fixed",
 		fixed = {-0.5, -0.5, -0.5, 0.5, -5/16, 0.5},
 	},
+})
+
+minetest.register_node("nyanland:mese_shrub_block", {
+	description = "Mese Shrub Block",
+	tiles = {"nyanland_mese_shrub_block.png"},
+	groups = {snappy = 3, flammable = 2, level = 2, not_in_creative_inventory = 1},
+	sounds = default.node_sound_leaves_defaults(),
 })
 
 -- Clonestone
