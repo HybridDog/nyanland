@@ -5,11 +5,14 @@ You are supposed to get back to surface by teleporting, e.g. /spawn chatcommand.
 
 **Depends:** see [depends.txt](https://raw.githubusercontent.com/HybridDog/nyanland/master/depends.txt)  
 **License:** see [LICENSE.txt](https://raw.githubusercontent.com/HybridDog/nyanland/master/LICENSE.txt)  
-**Download:** [zip](https://github.com/HybridDog/nyanland/archive/master.zip), [tar.gz](https://github.com/HybridDog/nyanland/archive/master.tar.gz)  
+**Download:** [zip](https://github.com/HybridDog/nyanland/archive/master.zip), [tar.gz](https://github.com/HybridDog/nyanland/archive/master.tar.gz)
 
 ![I'm a screenshot!](https://cloud.githubusercontent.com/assets/3192173/7671607/00b51678-fcd8-11e4-8a2b-4e6bce19620a.png)
 
 If you got ideas or found bugs, please tell them to me.
+
+[How to install a mod?](http://wiki.minetest.net/Installing_Mods)
+
 
 TODO:  
 — find out the license of the irc generated sounds
