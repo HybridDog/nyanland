@@ -1,4 +1,5 @@
-local load_time_start = os.clock()
+local load_time_start = minetest.get_us_time()
+
 
 NYANLAND_HEIGHT=30688
 NYANCAT_PROP=1
@@ -569,4 +570,10 @@ minetest.register_entity("nyanland:mese", {
 })
 
 
-minetest.log("info", string.format("[nyanland] loaded after ca. %.2fs", os.clock() - load_time_start))
+local time = (minetest.get_us_time() - load_time_start) / 1000000
+local msg = "[nyanland] loaded after ca. " .. time .. " seconds."
+if time > 0.01 then
+	print(msg)
+else
+	minetest.log("info", msg)
+end
