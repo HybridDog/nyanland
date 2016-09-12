@@ -1,10 +1,13 @@
 local function sandport(pos)
 	for i = -1,1,2 do
 		for j = -1,1,2 do
-			if minetest.get_node({x=pos.x+i, y=pos.y+2, z=pos.z+j}).name ~= "default:torch"
+			if ( minetest.get_node({x=pos.x+i, y=pos.y+2, z=pos.z+j}).name ~= "default:torch"
+			     and minetest.get_node({x=pos.x+i, y=pos.y+2, z=pos.z+j}).name ~= "torches:floor" )
 			or minetest.get_node({x=pos.x+i, y=pos.y+2, z=pos.z+j}).param2 ~= 1
 			or minetest.get_node({x=pos.x+i, y=pos.y+1, z=pos.z+j}).name ~= "default:sand"
 			or minetest.get_node({x=pos.x+i, y=pos.y, z=pos.z+j}).name ~= "default:sand" then
+				print(minetest.get_node({x=pos.x+i, y=pos.y+2, z=pos.z+j}).name,minetest.get_node({x=pos.x+i, y=pos.y+2, 
+					z=pos.z+j}).param2,minetest.get_node({x=pos.x+i, y=pos.y+1, z=pos.z+j}).name,minetest.get_node({x=pos.x+i, y=pos.y, z=pos.z+j}).name)
 				return false
 			end
 		end
@@ -22,7 +25,8 @@ local function sandport(pos)
 	for k = 3,4,1 do
 		for i = -k,k,2*k do
 			for j = -k,k,2*k do
-				if minetest.get_node({x=pos.x+i, y=pos.y, z=pos.z+j}).name ~= "default:torch"
+				if ( minetest.get_node({x=pos.x+i, y=pos.y, z=pos.z+j}).name ~= "default:torch"
+				     and minetest.get_node({x=pos.x+i, y=pos.y, z=pos.z+j}).name ~= "torches:floor")
 				or minetest.get_node({x=pos.x+i, y=pos.y, z=pos.z+j}).param2 ~= 1 then
 					return false
 				end
@@ -55,7 +59,7 @@ local function use_sand_portal(pos)
 	}
 	local target_pos = {x=pos.x, y=pos.y+NYANLAND_HEIGHT+10, z=pos.z}
 	minetest.after(math.random(16), function(pos)
-		local objs = minetest.get_objects_inside_radius({x=pos.x, y=pos.y+0.5, z=pos.z}, 0.5)
+		local objs = minetest.get_objects_inside_radius({x=pos.x, y=pos.y+0.5, z=pos.z}, 1)
 		for _, obj in pairs(objs) do
 			obj:setpos(target_pos)
 		end
