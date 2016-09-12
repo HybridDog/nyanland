@@ -6,8 +6,6 @@ local function sandport(pos)
 			or minetest.get_node({x=pos.x+i, y=pos.y+2, z=pos.z+j}).param2 ~= 1
 			or minetest.get_node({x=pos.x+i, y=pos.y+1, z=pos.z+j}).name ~= "default:sand"
 			or minetest.get_node({x=pos.x+i, y=pos.y, z=pos.z+j}).name ~= "default:sand" then
-				print(minetest.get_node({x=pos.x+i, y=pos.y+2, z=pos.z+j}).name,minetest.get_node({x=pos.x+i, y=pos.y+2, 
-					z=pos.z+j}).param2,minetest.get_node({x=pos.x+i, y=pos.y+1, z=pos.z+j}).name,minetest.get_node({x=pos.x+i, y=pos.y, z=pos.z+j}).name)
 				return false
 			end
 		end
