@@ -283,7 +283,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						data[p] = c_cloudstone
 					end
 					if tree_rn == 4 then
-						local p = area:index(x, y+1, z)
+						p = p + area.ystride
 						if pr:next(1, 1000) == 2 then
 							data[p] = c_mese_shrub_fruits
 						else
@@ -336,29 +336,35 @@ local c_ignore = minetest.get_content_id"ignore"
 local function mesetree(pos, tran, nodes, area, pr)
 	-- stem
 	local head_y = pos.y+4+tran
-	for y = pos.y, head_y do
-		local p = area:index(pos.x, y, pos.z)
+	local vi = area:indexp(pos)
+	for _ = 0, head_y - pos.y do
 		if pr:next(1,200) == 1 then
-			nodes[p] = c_hls
+			nodes[vi] = c_hls
 		else
-			nodes[p] = c_tree
+			nodes[vi] = c_tree
 		end
+		vi = vi + area.ystride
 	end
 	-- head
 	local s = NYANLAND_TREESIZE
-	for x = -s, s do
+	local stest = s*s + s
+	for z = -s, s do
 		for y = -s, s do
-			for z = -s, s do
-				if x*x + y*y + z*z <= s*s + s then
-					local p = area:index(pos.x+x, head_y+y, pos.z+z)
-					if nodes[p] == c_air
-					or nodes[p] == c_ignore then
-						if pr:next(1,5) ~= 1 then
-							nodes[p] = c_leaves
-						elseif pr:next(1,11) == 1 then
-							nodes[p] = c_apple
+			local zytest = z*z + y*y
+			if zytest <= stest then
+				local vi = area:index(pos.x-s, head_y+y, pos.z+z)
+				for x = -s, s do
+					if zytest + x*x <= stest then
+						if nodes[vi] == c_air
+						or nodes[vi] == c_ignore then
+							if pr:next(1,5) ~= 1 then
+								nodes[vi] = c_leaves
+							elseif pr:next(1,11) == 1 then
+								nodes[vi] = c_apple
+							end
 						end
 					end
+					vi = vi + 1
 				end
 			end
 		end
