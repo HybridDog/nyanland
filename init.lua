@@ -223,7 +223,8 @@ local height = {
 
 
 minetest.register_on_generated(function(minp, maxp, seed)
-	if (minp.y >= ypse+10 or maxp.y <= ypse-10) then
+	if minp.y >= ypse+10
+	or maxp.y <= ypse-10 then
 		return
 	end
 
