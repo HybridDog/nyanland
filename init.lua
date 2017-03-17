@@ -307,9 +307,12 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	vm:write_to_map()
 
 	if math.random(NYANCAT_PROP)==1 then
-		local nyan_headpos={}
-		nyan_headpos={x=minp.x+pr:next(1, 80), y=ypse+pr:next(1, 20)+10, z=minp.z+pr:next(1, 80)}
-		nyanland:add_nyancat(nyan_headpos, minp)
+		local nyan_headpos = {
+			x = minp.x + pr:next(1, 80),
+			y = ypse + pr:next(1, 20) + 10,
+			z = minp.z + pr:next(1, 80)
+		}
+		nyanland.add_nyancat(nyan_headpos)
 	end
 	if info then
 		local geninfo = string.format("[nyanland] done after: %.2fs", os.clock() - t1)
@@ -318,9 +321,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 end)
 
-function nyanland:add_nyancat(pos)
+function nyanland.add_nyancat(pos)
 	minetest.add_node(pos, {name="nyancat:nyancat"})
-	local length = math.random(4,15)
+	local length = math.random(4, 15)
 	for _ = 1, length do
 		pos.z = pos.z+1
 		minetest.add_node(pos, {name="nyancat:nyancat_rainbow"})
@@ -374,6 +377,15 @@ end
 
 function generate_mesetree(pos, nodes, area, pr)
 	mesetree(pos, pr:next(1,2), nodes, area, pr)
+end
+
+if minetest.global_exists"treecapitator" then
+	treecapitator.register_tree{
+		trees = {"nyanland:mesetree", "nyanland:healstone"},
+		leaves = {"nyanland:meseleaves"},
+		range = NYANLAND_TREESIZE,
+		fruits = {"default:apple"}
+	}
 end
 
 --[[function nyanland:grow_mesetree(pos)
@@ -546,10 +558,13 @@ function nyancat.place(pos, facedir, length)
 	local tailvec = minetest.facedir_to_dir(facedir)
 	local p = vector.new(pos)
 	minetest.set_node(p, {name = "nyanland:nyancat", param2 = facedir})
-	for i = 1, length+5 do
+	for _ = 1, length + 5 do
 		p.x = p.x + tailvec.x
 		p.z = p.z + tailvec.z
-		minetest.set_node(p, {name = "nyancat:nyancat_rainbow", param2 = facedir})
+		minetest.set_node(p, {
+			name = "nyancat:nyancat_rainbow",
+			param2 = facedir
+		})
 	end
 end
 
