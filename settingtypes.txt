@@ -1,0 +1,13 @@
+#    Show how much time map generation took in chat and infostream
+nyanland.enable_debug_messages (Show debug messages) bool false
+
+#    The y coordinate of the nyanland
+#    You likely don't want to change this if the world is explored
+nyanland.height (Height) int 30688 -32000 32000
+
+#    The radius of the nyanland tree heads
+nyanland.tree_size (Tree head size) int 2 0 80
+
+#    The change of generating a nyancat in a mapchunk
+#    Value in percent (default 100%)
+nyanland.nyancat_prop (Nyancat probability) float 100 0 100

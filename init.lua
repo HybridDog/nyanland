@@ -1,10 +1,11 @@
 local load_time_start = minetest.get_us_time()
 
 
-NYANLAND_HEIGHT=30688
-NYANCAT_PROP=1
-NYANLAND_TREESIZE=2
-local info = minetest.is_singleplayer()
+NYANLAND_HEIGHT = tonumber(minetest.settings:get"nyanland.height") or 30688
+NYANCAT_PROP = (tonumber(minetest.settings:get"nyanland.nyancat_prop")
+	or 100.0) / 100.0
+NYANLAND_TREESIZE = tonumber(minetest.settings:get"nyanland.tree_size") or 2
+local info = minetest.settings:get_bool"nyanland.enable_debug_messages"
 
 local nyanland={}
 
@@ -150,7 +151,7 @@ minetest.register_abm({
 	nodenames = {"nyanland:healstone"},
 	interval = 1.0,
 	chance = 1,
-	action = function(pos)
+	action = function(pos,_,r,re)
 		for _, obj in pairs(minetest.get_objects_inside_radius(pos, 3)) do
 			local hp = obj:get_hp()
 			if hp >= 20 then return end
@@ -306,7 +307,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	--vm:update_liquids()
 	vm:write_to_map()
 
-	if math.random(NYANCAT_PROP)==1 then
+	if math.random() <= NYANCAT_PROP then
 		local nyan_headpos = {
 			x = minp.x + pr:next(1, 80),
 			y = ypse + pr:next(1, 20) + 10,
