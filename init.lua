@@ -1,13 +1,11 @@
-local load_time_start = minetest.get_us_time()
-
-
-NYANLAND_HEIGHT = tonumber(minetest.settings:get"nyanland.height") or 30688
-NYANCAT_PROP = (tonumber(minetest.settings:get"nyanland.nyancat_prop")
-	or 100.0) / 100.0
-NYANLAND_TREESIZE = tonumber(minetest.settings:get"nyanland.tree_size") or 2
-local info = minetest.settings:get_bool"nyanland.enable_debug_messages"
-
-local nyanland={}
+local settings = {
+	height = tonumber(minetest.settings:get"nyanland.height") or 30688,
+	nyancat_prop = (tonumber(minetest.settings:get"nyanland.nyancat_prop")
+		or 100.0) / 100.0,
+	tree_size = tonumber(minetest.settings:get"nyanland.tree_size") or 2,
+	enable_debug_messages =
+		minetest.settings:get_bool"nyanland.enable_debug_messages"
+}
 
 minetest.register_craft({
 	output = "nyanland:mese_shrub_block",
@@ -151,7 +149,7 @@ minetest.register_abm({
 	nodenames = {"nyanland:healstone"},
 	interval = 1.0,
 	chance = 1,
-	action = function(pos,_,r,re)
+	action = function(pos)
 		for _, obj in pairs(minetest.get_objects_inside_radius(pos, 3)) do
 			local hp = obj:get_hp()
 			if hp >= 20 then return end
@@ -159,6 +157,15 @@ minetest.register_abm({
 		end
 	end,
 })
+
+local function add_nyancat(pos)
+	minetest.add_node(pos, {name="nyancat:nyancat"})
+	local length = math.random(4, 15)
+	for _ = 1, length do
+		pos.z = pos.z+1
+		minetest.add_node(pos, {name="nyancat:nyancat_rainbow"})
+	end
+end
 
 
 -- Weierstrass function code from https://github.com/slemonide/gen
@@ -202,7 +209,7 @@ local c_cloud = minetest.get_content_id"default:cloud"
 local c_mese = minetest.get_content_id"default:mese"
 local c_ice = minetest.get_content_id"default:ice"
 
-local ypse = NYANLAND_HEIGHT
+local ypse = settings.height
 
 local hole = {
 	seed = 13,
@@ -230,9 +237,11 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 
 	local t1
-	if info then
+	if settings.enable_debug_messages then
 		t1 = os.clock()
-		local geninfo = "[nyanland] generates: x=["..minp.x.."; "..maxp.x.."]; y=["..minp.y.."; "..maxp.y.."]; z=["..minp.z.."; "..maxp.z.."]"
+		local geninfo = "[nyanland] generates: x=[" .. minp.x .. "; " ..
+			maxp.x .. "]; y=[" .. minp.y .. "; " .. maxp.y .. "]; z=[" ..
+			minp.z .. "; " .. maxp.z .. "]"
 		minetest.log("info", geninfo)
 		minetest.chat_send_all(geninfo)
 	end
@@ -244,8 +253,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local side_length = maxp.x - minp.x + 1
 	local map_lengths_xyz = {x=side_length, y=side_length, z=side_length}
 
-	local pmap1 = minetest.get_perlin_map(hole, map_lengths_xyz):get2dMap_flat{x=minp.x, y=minp.z}
-	local pmap2 = minetest.get_perlin_map(height, map_lengths_xyz):get2dMap_flat{x=minp.x, y=minp.z}
+	local pmap1 = minetest.get_perlin_map(hole, map_lengths_xyz
+		):get2dMap_flat{x=minp.x, y=minp.z}
+	local pmap2 = minetest.get_perlin_map(height, map_lengths_xyz
+		):get2dMap_flat{x=minp.x, y=minp.z}
 
 	local num = 1
 	local tab = {}
@@ -259,9 +270,13 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				local y = ypse + math.floor(pmap1[count]*3+0.5)
 				if y <= maxp.y
 				and y >= minp.y then
-					local depth = math.floor(((get_ws_value(3, x)+get_ws_value(5, z))%14)*math.min((test2-0.2)*25/4, 1)+0.5)
+					local depth = math.floor(
+						((get_ws_value(3, x) + get_ws_value(5, z)) % 14)
+						* math.min((test2 - 0.2) * 25 / 4, 1)
+						+ 0.5)
 					if depth ~= 0 then
-						local sel = math.floor(get_ws_value(2, x)+get_ws_value(2, z)+0.5)%10
+						local sel = math.floor(get_ws_value(2, x) +
+							get_ws_value(2, z) + 0.5) % 10
 						local p = area:index(x, y-depth, z)
 						if sel <= 5 then
 							data[p] = c_cloudstone
@@ -307,29 +322,21 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	--vm:update_liquids()
 	vm:write_to_map()
 
-	if math.random() <= NYANCAT_PROP then
+	if math.random() <= settings.nyancat_prop then
 		local nyan_headpos = {
 			x = minp.x + pr:next(1, 80),
 			y = ypse + pr:next(1, 20) + 10,
 			z = minp.z + pr:next(1, 80)
 		}
-		nyanland.add_nyancat(nyan_headpos)
+		add_nyancat(nyan_headpos)
 	end
-	if info then
-		local geninfo = string.format("[nyanland] done after: %.2fs", os.clock() - t1)
+	if settings.enable_debug_messages then
+		local geninfo = string.format("[nyanland] done after: %.2fs",
+			os.clock() - t1)
 		minetest.log("info", geninfo)
 		minetest.chat_send_all(geninfo)
 	end
 end)
-
-function nyanland.add_nyancat(pos)
-	minetest.add_node(pos, {name="nyancat:nyancat"})
-	local length = math.random(4, 15)
-	for _ = 1, length do
-		pos.z = pos.z+1
-		minetest.add_node(pos, {name="nyancat:nyancat_rainbow"})
-	end
-end
 
 local c_tree = minetest.get_content_id"nyanland:mesetree"
 local c_hls = minetest.get_content_id"nyanland:healstone"
@@ -341,17 +348,17 @@ local c_ignore = minetest.get_content_id"ignore"
 local function mesetree(pos, tran, nodes, area, pr)
 	-- stem
 	local head_y = pos.y+4+tran
-	local vi = area:indexp(pos)
+	local vi_trunk = area:indexp(pos)
 	for _ = 0, head_y - pos.y do
 		if pr:next(1,200) == 1 then
-			nodes[vi] = c_hls
+			nodes[vi_trunk] = c_hls
 		else
-			nodes[vi] = c_tree
+			nodes[vi_trunk] = c_tree
 		end
-		vi = vi + area.ystride
+		vi_trunk = vi_trunk + area.ystride
 	end
 	-- head
-	local s = NYANLAND_TREESIZE
+	local s = settings.tree_size
 	local stest = s*s + s
 	for z = -s, s do
 		for y = -s, s do
@@ -384,7 +391,7 @@ if minetest.global_exists"treecapitator" then
 	treecapitator.register_tree{
 		trees = {"nyanland:mesetree", "nyanland:healstone"},
 		leaves = {"nyanland:meseleaves"},
-		range = NYANLAND_TREESIZE,
+		range = settings.tree_size,
 		fruits = {"default:apple"}
 	}
 end
@@ -407,7 +414,8 @@ end
 	manip:set_data(nodes)
 	manip:write_to_map()
 	if info then
-		minetest.log("info", string.format("[nyanland] a mesetree grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") after: %.2fs", os.clock() - t1))
+		minetest.log("info", string.format("[nyanland] a mesetree grew at ("..
+			pos.x.."|"..pos.y.."|"..pos.z..") after: %.2fs", os.clock() - t1))
 		t1 = os.clock()
 	end
 	manip:update_map()	--calc shadows
@@ -423,13 +431,22 @@ minetest.register_abm({
 	chance = 100,
 	catch_up = false,
 	action = function(pos)
-		if pos.y > NYANLAND_HEIGHT then
+		if pos.y > settings.height then
 			minetest.remove_node(pos)
 			minetest.add_entity(pos, "nyanland:head_entity")
 			minetest.sound_play("nyanland_cat", {pos = pos,	gain = 0.9, max_hear_distance = 35})
 		end
 	end,
 })
+
+local function spawn_falling_node(pos, node)
+	local obj = minetest.add_entity(pos, "__builtin:falling_node")
+	if not obj then
+		minetest.log("error", "Could not add a falling_node entity")
+		return
+	end
+	obj:get_luaentity():set_node(node)
+end
 
 minetest.register_entity("nyanland:head_entity", {
 	physical = true,
@@ -449,7 +466,8 @@ minetest.register_entity("nyanland:head_entity", {
 	on_punch = function(self)
 		local mesepos = self.object:getpos()
 		if math.random(10) == 1 then
-			minetest.sound_play("nyanland_cat", {pos = mesepos,	gain = 0.9, max_hear_distance = 35})
+			minetest.sound_play("nyanland_cat",
+				{pos = mesepos,	gain = 0.9, max_hear_distance = 35})
 		end
 		mesepos.y = mesepos.y-1
 		spawn_falling_node(mesepos, {name = "default:mese_block"})
@@ -570,6 +588,7 @@ function nyancat.place(pos, facedir, length)
 end
 
 
+nyanland_height = settings.height
 dofile(minetest.get_modpath"nyanland".."/portal.lua")
 
 
@@ -591,12 +610,3 @@ minetest.register_entity("nyanland:mese", {
 		self.object:remove()
 	end,
 })
-
-
-local time = (minetest.get_us_time() - load_time_start) / 1000000
-local msg = "[nyanland] loaded after ca. " .. time .. " seconds."
-if time > 0.01 then
-	print(msg)
-else
-	minetest.log("info", msg)
-end

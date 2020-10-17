@@ -55,14 +55,14 @@ local function use_sand_portal(pos)
 		collisiondetection = true,
 		texture = "smoke_puff.png"
 	}
-	local target_pos = {x=pos.x, y=pos.y+NYANLAND_HEIGHT+10, z=pos.z}
-	minetest.after(math.random(16), function(pos)
+	minetest.after(math.random(16), function()
+		local target_pos = {x=pos.x, y=pos.y + nyanland_height + 10, z=pos.z}
 		local objs = minetest.get_objects_inside_radius({x=pos.x, y=pos.y+0.5, z=pos.z}, 1)
 		for _, obj in pairs(objs) do
 			obj:setpos(target_pos)
 		end
 		minetest.sound_play("nyanland_cat", {pos = target_pos,	gain = 0.9,	max_hear_distance = 35})
-	end, pos)
+	end)
 end
 
 minetest.register_on_punchnode(function(pos, node, puncher)
